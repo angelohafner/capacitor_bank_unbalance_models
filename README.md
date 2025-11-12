@@ -75,6 +75,7 @@ capacitor_bank_unbalance_models/
 
 **Angelo Alfredo Hafner**  
 Engenheiro Eletricista – DAX-Energy  
+https://dax.energy/
 [GitHub](https://github.com/angelohafner)
 
 ---
