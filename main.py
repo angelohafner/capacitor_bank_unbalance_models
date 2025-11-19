@@ -5,6 +5,7 @@ import streamlit as st
 from master_bank_classes import MasterBankClasses
 from input_widgets import get_dados_nominais_banco
 from utils_streamlit import ensure_export_dir, show_topology_figure, show_downloads
+from latex_report_generator import LatexReportGenerator
 
 
 # ---------------- Page config ----------------
@@ -36,7 +37,7 @@ col1, col2, col3 = st.columns([2, 1, 1])
 with col1:
     topologia = st.selectbox(
         "Topologia de proteção:",
-        ["yy_internal_fuses", "yy_external_fuses", "h_bridge_internal_fuses", "h_bridge_external_fuses"],
+        ["yy_external_fuses", "yy_internal_fuses", "h_bridge_internal_fuses", "h_bridge_external_fuses"],
     )
 
 with col2:
@@ -58,6 +59,8 @@ show_topology_figure(topologia)
 ensure_export_dir()
 
 dados_nominais_banco = get_dados_nominais_banco(topologia)
+LatexReportGenerator.export_dict_tabular(data=dados_nominais_banco, filename="tabela_dados_nominais.tex")
+
 if not dados_nominais_banco:
     st.stop()
 
@@ -67,68 +70,105 @@ match topologia:
         # Table 8
         tabela8, df_ieee8, df_real8 = MasterBankClasses.compute_table08_from_dict(
             dados_nominais_banco,
-            tex_filename=os.path.join("exported", "tabela8_real.tex"),
-            xlsx_filename=os.path.join("exported", "tabela8_real.xlsx"),
+            tex_filename=os.path.join("tex_files", "tables", "tabela8_real.tex"),
+            xlsx_filename=os.path.join("tex_files", "tables", "tabela8_real.xlsx"),
             f_values=None,
             export_tex=True,
             export_xlsx=True,
         )
         st.success("Tabela 8 gerada (H-Bridge com fusíveis internos).")
         show_downloads(
-            base_name="tabela8_real",
-            payload_for_dict=df_ieee8,
-            dict_basename="df_ieee8",   # df_ieee8.json / df_ieee8.txt
+            xlsx_file="tabela8_real.xlsx",
+            # tex_file="tabela8_real.tex",
+            # json_file="dados.json",
+            # txt_file="dados.txt",
         )
+
+        # LaTeX report for internal fuses (H-Bridge)
+        generator = LatexReportGenerator(template_path="tex_files/templates/TEMPLATE__FI.tex")
+        output_file = generator.generate(topologia, dados_nominais_banco)
+        st.dataframe(df_real8)
+        generator.compile_pdf(tex_path=output_file)
+
+
+
+    case "yy_external_fuses":
+        # Table 3 (external)
+        tabela3ext, df_ieee3ext, df_real3ext = MasterBankClasses.compute_table03_from_dict(
+            dados_nominais_banco,
+            tex_filename=os.path.join("tex_files", "tables", "tabela3ext_real.tex"),
+            xlsx_filename=os.path.join("tex_files", "tables", "tabela3ext_real.xlsx"),
+            export_tex=True,
+            export_xlsx=True,
+        )
+        st.success("Tabela 3 (externa) gerada (Dupla estrela com fusíveis externos).")
+        show_downloads(
+            xlsx_file="tabela3ext_real.xlsx",
+            # tex_file="tabela3ext_real.tex",
+            # json_file="dados.json",
+            # txt_file="dados.txt",
+        )
+
+        # LaTeX report for external fuses (YY)
+        generator = LatexReportGenerator(template_path="tex_files/templates/TEMPLATE__FE.tex")
+        output_file = generator.generate(topologia, dados_nominais_banco)
+        st.dataframe(df_real3ext)
+        generator.compile_pdf(tex_path=output_file)
+
+        # FIX: name consistent with xlsx_filename used above
+
 
     case "yy_internal_fuses":
         # Table 7
         tabela7, df_ieee7, df_real7 = MasterBankClasses.compute_table07_from_dict(
             dados_nominais_banco,
-            tex_filename=os.path.join("exported", "tabela7_real.tex"),
-            xlsx_filename=os.path.join("exported", "tabela7_real.xlsx"),
+            tex_filename=os.path.join("tex_files", "tables", "tabela7_real.tex"),
+            xlsx_filename=os.path.join("tex_files", "tables", "tabela7_real.xlsx"),
             f_values=None,
             export_tex=True,
             export_xlsx=True,
         )
         st.success("Tabela 7 gerada (Dupla estrela com fusíveis internos).")
         show_downloads(
-            base_name="tabela7_real",
-            payload_for_dict=df_ieee7,
-            dict_basename="df_ieee7",   # df_ieee7.json / df_ieee7.txt
+            xlsx_file="tabela7_real.xlsx",
+            # tex_file="tabela7_real.tex",
+            # json_file="dados.json",
+            # txt_file="dados.txt",
         )
+
+        # LaTeX report for internal fuses (YY)
+        generator = LatexReportGenerator(template_path="tex_files/templates/TEMPLATE__FI.tex")
+        output_file = generator.generate(topologia, dados_nominais_banco)
+        print(output_file)
+        st.dataframe(df_real7)
+        generator.compile_pdf(tex_path=output_file)
+
+
 
     case "h_bridge_external_fuses":
         # Table 6
         tabela6, df_ieee6, df_real6 = MasterBankClasses.compute_table06_from_dict(
             dados_nominais_banco,
-            tex_filename=os.path.join("exported", "tabela6_real.tex"),
-            xlsx_filename=os.path.join("exported", "tabela6_real.xlsx"),
+            tex_filename=os.path.join("tex_files", "tables", "tabela6_real.tex"),
+            xlsx_filename=os.path.join("tex_files", "tables", "tabela6_real.xlsx"),
             export_tex=True,
             export_xlsx=True,
         )
         st.success("Tabela 6 gerada (H-Bridge com fusíveis externos).")
         show_downloads(
-            base_name="tabela6_real",
-            payload_for_dict=df_ieee6,
-            dict_basename="df_ieee6",   # df_ieee6.json / df_ieee6.txt
+            xlsx_file="tabela6_real.xlsx",
+            # tex_file="tabela6_real.tex",
+            # json_file="dados.json",
+            # txt_file="dados.txt",
         )
 
-    case "yy_external_fuses":
-        # Table 3 (external)
-        tabela3ext, df_ieee3ext, df_real3ext = MasterBankClasses.compute_table03_from_dict(
-            dados_nominais_banco,
-            tex_filename=os.path.join("exported", "tabela3ext_real.tex"),
-            xlsx_filename=os.path.join("exported", "tabela3ext_real.xlsx"),
-            f_values=None,
-            export_tex=True,
-            export_xlsx=True,
-        )
-        st.success("Tabela 3 (externa) gerada (Dupla estrela com fusíveis externos).")
-        show_downloads(
-            base_name="tabela3ext_real",
-            payload_for_dict=df_ieee3ext,
-            dict_basename="df_ieee3ext",  # df_ieee3ext.json / df_ieee3ext.txt
-        )
+        # LaTeX report for external fuses (H-Bridge)
+        generator = LatexReportGenerator(template_path="tex_files/templates/TEMPLATE__FE.tex")
+        output_file = generator.generate(topologia, dados_nominais_banco)
+        st.dataframe(df_real6)
+        generator.compile_pdf(tex_path=output_file)
+
+
 
     case _:
         st.error("Topologia não reconhecida.")

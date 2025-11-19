@@ -9,8 +9,7 @@ import pandas as pd
 
 def ensure_export_dir():
     """Create 'exported' folder if it does not exist."""
-    os.makedirs("exported", exist_ok=True)
-
+    os.makedirs("./tex_files/tables", exist_ok=True)
 
 def show_topology_figure(topologia: str):
     """Show figure for the selected topology (if available)."""
@@ -34,9 +33,9 @@ def show_topology_figure(topologia: str):
     if topologia == "h_bridge_external_fuses" or topologia == "h_bridge_internal_fuses":
         left, center, right = st.columns([1, 4, 1])
         with center:
-            st.image(path, caption=f"Topology: {topologia}", width="stretch")
+            st.image(path, caption=f"Topology: {topologia}", use_container_width=True)
     else:
-        st.image(path, caption=f"Topology: {topologia}", width="stretch")
+        st.image(path, caption=f"Topology: {topologia}", use_container_width=True)
 
 
 def _serialize_to_json_bytes(obj) -> bytes:
@@ -65,63 +64,84 @@ def _serialize_to_txt_bytes(obj) -> bytes:
     return txt.encode("utf-8")
 
 
-def show_downloads(base_name: str, payload_for_dict=None, dict_basename: str | None = None):
+def show_downloads(
+    base_name: str | None = None,
+    *,
+    xlsx_file: str | None = None,
+    tex_file: str | None = None,
+    payload_for_dict=None,
+    json_file: str | None = None,
+    txt_file: str | None = None,
+):
     """
-    Render download buttons for Excel and LaTeX files in 'exported',
-    and (optionally) extra JSON/TXT for a dict-like payload.
+    Exibe botões de download para arquivos XLSX, TEX, PDF, JSON e TXT.
 
-    Parameters
+    Agora cada arquivo pode ter o nome definido individualmente.
+    Se não for fornecido, tenta usar base_name como padrão.
+
+    Parâmetros
     ----------
-    base_name : str
-        Base filename for .xlsx and .tex (without folder).
-    payload_for_dict : any, optional
-        Dict-like or pandas object to serialize (e.g., df_ieee3ext).
-    dict_basename : str, optional
-        Base filename for JSON/TXT (defaults to base_name if None).
+    base_name : str, opcional
+        Nome base antigo (continua funcionando).
+    xlsx_file, tex_file, pdf_file, json_file, txt_file : str, opcionais
+        Nomes individuais dos arquivos.
+    payload_for_dict : dict/DataFrame opcional
+        Conteúdo para exportar via JSON/TXT.
     """
-    xlsx_path = os.path.join("exported", f"{base_name}.xlsx")
-    tex_path = os.path.join("exported", f"{base_name}.tex")
 
-    # Excel
-    if os.path.exists(xlsx_path):
-        with open(xlsx_path, "rb") as f_xlsx:
+    # ====== 1) Resolver nomes ======
+    if base_name:
+        if xlsx_file is None:
+            xlsx_file = f"{base_name}.xlsx"
+        if tex_file is None:
+            tex_file = f"{base_name}.tex"
+        if json_file is None:
+            json_file = f"{base_name}.json"
+        if txt_file is None:
+            txt_file = f"{base_name}.txt"
+
+    # ====== 2) Caminhos completos ======
+    xlsx_path = os.path.join("tex_files", "tables", xlsx_file) if xlsx_file else None
+    tex_path  = os.path.join("tex_files", "tables", tex_file)  if tex_file else None
+
+    # ====== 3) XLSX ======
+    if xlsx_path and os.path.exists(xlsx_path):
+        with open(xlsx_path, "rb") as f:
             st.download_button(
-                label=f"⬇️ Baixar {base_name}.xlsx",
-                data=f_xlsx,
-                file_name=f"{base_name}.xlsx",
+                label=f"⬇️ Baixar {xlsx_file}",
+                data=f,
+                file_name=xlsx_file,
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             )
-    else:
-        st.info(f"Arquivo não encontrado: {xlsx_path}")
 
-    # LaTeX
-    if os.path.exists(tex_path):
-        with open(tex_path, "rb") as f_tex:
+    # ====== 4) TEX ======
+    if tex_path and os.path.exists(tex_path):
+        with open(tex_path, "rb") as f:
             st.download_button(
-                label=f"⬇️ Baixar {base_name}.tex",
-                data=f_tex,
-                file_name=f"{base_name}.tex",
+                label=f"⬇️ Baixar {tex_file}",
+                data=f,
+                file_name=tex_file,
                 mime="application/x-tex",
             )
-    else:
-        st.info(f"Arquivo não encontrado: {tex_path}")
 
-    # Optional dict/DataFrame export as JSON/TXT
+    # ====== 6) JSON e TXT ======
     if payload_for_dict is not None:
-        dict_base = dict_basename if dict_basename else base_name
+        if json_file:
+            json_bytes = _serialize_to_json_bytes(payload_for_dict)
+            st.download_button(
+                label=f"⬇️ Baixar {json_file}",
+                data=io.BytesIO(json_bytes),
+                file_name=json_file,
+                mime="application/json",
+            )
 
-        json_bytes = _serialize_to_json_bytes(payload_for_dict)
-        st.download_button(
-            label=f"⬇️ Baixar {dict_base}.json",
-            data=io.BytesIO(json_bytes),
-            file_name=f"{dict_base}.json",
-            mime="application/json",
-        )
+        if txt_file:
+            txt_bytes = _serialize_to_txt_bytes(payload_for_dict)
+            st.download_button(
+                label=f"⬇️ Baixar {txt_file}",
+                data=io.BytesIO(txt_bytes),
+                file_name=txt_file,
+                mime="text/plain",
+            )
 
-        txt_bytes = _serialize_to_txt_bytes(payload_for_dict)
-        st.download_button(
-            label=f"⬇️ Baixar {dict_base}.txt",
-            data=io.BytesIO(txt_bytes),
-            file_name=f"{dict_base}.txt",
-            mime="text/plain",
-        )
+

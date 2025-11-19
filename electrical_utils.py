@@ -139,7 +139,7 @@ class ElectricalUtils:
 
         if "Vcu" in df.columns:
             out["Vcu"] = df["Vcu"]
-            out["Vcu_V"] = df["Vcu"] * resultados["V_unit"]
+            out["Vcu_kV"] = df["Vcu"] * resultados["V_unit"] * 1e-3
 
 
         # Format: 2 decimals, keep integers without comma
@@ -155,18 +155,19 @@ class ElectricalUtils:
             filename: str = "tabela.tex",
             f_values: Optional[Iterable[int]] = None,
             decimals: int = 2,
+            transpose: bool = True,
+            line_max_vcu: Optional[int] = None,
     ) -> str:
         r"""
         Export df_real to LaTeX in the format:
 
-        \begin{tabular}{lrrrr...}
-        \toprule
-        $f$ & 0 & 1 & 2 & ... \\
-        \midrule
-        $C_p \, \mathrm{pu}$ & ...
-        ...
-        \bottomrule
-        \end{tabular}
+        (default) variables as rows, f as columns, then optionally transposed.
+
+        If transpose=True, the table is transposed (each row is one harmonic f).
+
+        If line_max_vcu is not None, the row where f == line_max_vcu
+        is colored red, and the two rows above it (if they exist) are
+        colored brown.
         """
 
         # --- column headers (f) ---
@@ -183,68 +184,114 @@ class ElectricalUtils:
         rows = []
 
         def add_row(label: str, colname: str):
-            # Only append the row if the column exists
             if colname in df_real.columns:
                 rows.append((label, pd.to_numeric(df_real[colname], errors="coerce").values))
 
         def add_pair(label_pu: str, col_pu: str, label_si: str, col_si: str):
-            # Add pu line; add SI line only if SI column also exists
             if col_pu in df_real.columns:
                 add_row(label_pu, col_pu)
                 if col_si in df_real.columns:
                     add_row(label_si, col_si)
 
+        # First row is f
         rows.append((r"$f$", pd.to_numeric(f_vals, errors="coerce")))
 
         # Cp / Cu blocks
-        add_pair(r"$C_p \, \mathrm{pu}$", "Cp", r"$C_p \, [\mu\mathrm{F}]$", "Cp_uF")
-        add_pair(r"$C_u \, \mathrm{pu}$", "Cu", r"$C_u \, [\mu\mathrm{F}]$", "C_unit_uF")
+        add_pair(r"$C_p \, [\mathrm{pu}]$", "Cp", r"$C_p \, [\mu\mathrm{F}]$", "Cp_uF")
+        add_pair(r"$C_u \, [\mathrm{pu}]$", "Cu", r"$C_u \, [\mu\mathrm{F}]$", "C_unit_uF")
 
         # Vng / V_phase
-        add_pair(r"$V_{ng} \, \mathrm{pu}$", "Vng", r"$V_{ng} \, [\mathrm{V}]$", "V_phase_V")
+        add_pair(r"$V_{ng} \, [\mathrm{pu}]$", "Vng", r"$V_{ng} \, [\mathrm{V}]$", "V_phase_V")
 
         # In / Ig (both pu and A)
-        add_pair(r"$I_{n} \, \mathrm{pu}$", "In", r"$I_{n} \, [\mathrm{A}]$", "In_A")
-        add_pair(r"$I_{g} \, \mathrm{pu}$", "Ig", r"$I_{g} \, [\mathrm{A}]$", "Ig_A")
+        add_pair(r"$I_{n} \, [\mathrm{pu}]$", "In", r"$I_{n} \, [\mathrm{A}]$", "In_A")
+        add_pair(r"$I_{g} \, [\mathrm{pu}]$", "Ig", r"$I_{g} \, [\mathrm{A}]$", "Ig_A")
 
         # Chn / Vhn / Ih / Vcu (pu and real units)
-        add_pair(r"$C_{hn} \, \mathrm{pu}$", "Chn", r"$C_{hn} \, [\mu\mathrm{F}]$", "Chn_uF")
-        add_pair(r"$V_{hn} \, \mathrm{pu}$", "Vhn", r"$V_{hn} \, [\mathrm{V}]$", "Vhn_V")
-        add_pair(r"$I_{h} \, \mathrm{pu}$", "Ih", r"$I_{h} \, [\mathrm{A}]$", "Ih_A")
-        add_pair(r"$V_{cu} \, \mathrm{pu}$", "Vcu", r"$V_{cu} \, [\mathrm{V}]$", "Vcu_V")
+        add_pair(r"$C_{hn} \, [\mathrm{pu}]$", "Chn", r"$C_{hn} \, [\mu\mathrm{F}]$", "Chn_uF")
+        add_pair(r"$V_{hn} \, [\mathrm{pu}]$", "Vhn", r"$V_{hn} \, [\mathrm{V}]$", "Vhn_V")
+        add_pair(r"$I_{h} \, [\mathrm{pu}]$", "Ih", r"$I_{h} \, [\mathrm{A}]$", "Ih_A")
+        add_pair(r"$V_{cu} \, [\mathrm{pu}]$", "Vcu", r"$V_{cu} \, [\mathrm{kV}]$", "Vcu_kV")
 
-        # --- build LaTeX table manually ---
-        column_format = "l" + "r" * n_cols
+        # --- formatter for numbers ---
+        def _fmt_cell(v, is_f_row: bool, decimals_: int):
+            """
+            - Linha do f (is_f_row=True): sempre inteiro.
+            - Outras linhas: sempre `decimals_` casas decimais, com vírgula.
+            """
+            try:
+                fv = float(v)
+            except Exception:
+                return str(v)
+
+            if is_f_row:
+                return str(int(fv))
+
+            txt = f"{fv:.{decimals_}f}"
+            return txt.replace(".", ",")
+
+        # Build table as list-of-lists of strings: first col is label
+        table_rows = []
+        for label, values in rows:
+            is_f_row = (label == r"$f$")
+            row = [label] + [_fmt_cell(v, is_f_row=is_f_row, decimals_=decimals) for v in values]
+            table_rows.append(row)
+
+        # Optional transpose (rows <-> columns)
+        if transpose:
+            transposed = []
+            n_r = len(table_rows)
+            n_c = len(table_rows[0])
+            for j in range(n_c):
+                transposed.append([table_rows[i][j] for i in range(n_r)])
+            table_rows = transposed
+
+        # --- build LaTeX table ---
+        n_cols_out = len(table_rows[0]) - 1
+        column_format = "r" + "r" * n_cols_out
+
         latex_lines = []
         latex_lines.append(f"\\begin{{tabular}}{{{column_format}}}")
         latex_lines.append("\\toprule")
 
         # Header
-        header = " & ".join([r"$f$"] + [str(f) for f in f_vals]) + r" \\"
+        header = " & ".join(table_rows[0]) + r" \\"
         latex_lines.append(header)
         latex_lines.append("\\midrule")
 
-        # Cell formatter: numbers get decimals; integers without .00; strings preserved
-        def _fmt_cell(v, decimals_=decimals):
-            try:
-                fv = float(v)
-                if fv.is_integer():
-                    return str(int(fv))
-                return f"{fv:.{decimals_}f}"
-            except Exception:
-                return str(v)
+        # ---- color logic for body rows ----
+        target_idx = None
+        body_rows = table_rows[1:]
+
+        if line_max_vcu is not None:
+            for i, row in enumerate(body_rows):
+                # first cell of each body row is f (already inteiro em string)
+                try:
+                    f_val = int(float(str(row[0]).replace(",", ".")))
+                except Exception:
+                    continue
+                if f_val == line_max_vcu:
+                    target_idx = i
+                    break
 
         # Body
-        for label, values in rows[1:]:
-            vals = " & ".join([_fmt_cell(v) for v in values])
-            latex_lines.append(f"{label} & {vals} \\\\")
+        for i, row in enumerate(body_rows):
+            row_to_use = row
+
+            if target_idx is not None:
+                if i == target_idx:
+                    row_to_use = [r"\textcolor{red}{" + cell + "}" for cell in row]
+                elif i == target_idx - 2: #(or i == target_idx - 1 )
+                    row_to_use = [r"\textcolor{blue}{" + cell + "}" for cell in row]
+
+            line = " & ".join(row_to_use) + r" \\"
+            latex_lines.append(line)
 
         latex_lines.append("\\bottomrule")
         latex_lines.append("\\end{tabular}")
 
         latex_table = "\n".join(latex_lines)
 
-        # --- write .tex file ---
         with open(filename, "w", encoding="utf-8") as f:
             f.write(latex_table)
 
@@ -255,16 +302,17 @@ class ElectricalUtils:
             df_real: pd.DataFrame,
             filename: str = "tabela.xlsx",
             f_values: Optional[Iterable[int]] = None,
+            transpose: bool = False,
     ) -> None:
         """
         Exporta df_real para Excel com rótulos de linha:
         f, Cp (pu), Cp (μF), Cu (pu), Cu (μF), Vng (pu), Vng (V),
         In (pu), In (A), Ig (pu), Ig (A),
         Chn (pu), Chn (μF), Vhn (pu), Vhn (V), Ih (pu), Ih (A), Vcu (pu), Vcu (V).
-        Inclui apenas as linhas cujas colunas existirem no df_real.
+
+        Se transpose=True, a planilha é transposta (f em linhas).
         """
 
-        # 1) Cabeçalho f (número de colunas)
         if f_values is None:
             f_vals = list(range(len(df_real)))
         else:
@@ -274,14 +322,11 @@ class ElectricalUtils:
         if len(f_vals) != n_cols:
             raise ValueError("`f_values` length must match number of rows in `df_real`.")
 
-        # 2) Helpers
         rows = []
 
         def add_row(label: str, colname: str):
             if colname in df_real.columns:
-                # Pegamos os valores "as-is"
                 vals = list(df_real[colname].values)
-                # Formatação leve: inteiros sem .00; floats com 2 casas; strings preservadas
                 fmt_vals = []
                 for v in vals:
                     try:
@@ -300,7 +345,7 @@ class ElectricalUtils:
                 if col_si in df_real.columns:
                     add_row(label_si, col_si)
 
-        # 3) Monta linhas, de forma condicional (análoga ao LaTeX)
+        # f row
         rows.append(("f", list(f_vals)))
 
         # Cp / Cu
@@ -318,13 +363,14 @@ class ElectricalUtils:
         add_pair("Chn (pu)", "Chn", "Chn (μF)", "Chn_uF")
         add_pair("Vhn (pu)", "Vhn", "Vhn (V)", "Vhn_V")
         add_pair("Ih (pu)", "Ih", "Ih (A)", "Ih_A")
-        add_pair("Vcu (pu)", "Vcu", "Vcu (V)", "Vcu_V")
+        add_pair("Vcu (pu)", "Vcu", "Vcu (kV)", "Vcu_kV")
 
-        # 4) Constrói DataFrame rotacionado (linhas = rótulos; colunas = f)
-        # data[j] é a j-ésima coluna (f), composta pelos i-ésimos elementos de cada linha
+        # Constrói DataFrame: linhas = labels; colunas = f
         data = {j: [r[1][j] for r in rows] for j in range(n_cols)}
         out = pd.DataFrame(data, index=[r[0] for r in rows])
 
-        # 5) Exporta sem cabeçalho (primeira linha são rótulos de linha)
+        if transpose:
+            out = out.T
+
         out.to_excel(filename, header=False, index=True)
-        print(f"Tabela exportada para '{filename}' (sem linha 'Label').")
+        print("Tabela exportada para '{0}' (sem linha 'Label').".format(filename))

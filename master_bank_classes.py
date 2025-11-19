@@ -39,6 +39,7 @@ def _postprocess_and_export(
     export_tex: bool,
     export_xlsx: bool,
     real_units_hook: Optional[Callable[[pd.DataFrame, Dict[str, Any]], pd.DataFrame]] = None,
+    transpose: bool = False,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     Convert IEEE p.u. to real units, manage 'f' labels, and export artifacts.
@@ -52,15 +53,37 @@ def _postprocess_and_export(
 
     if "f" in df_ieee.columns:
         f_values = df_ieee["f"]
+        key_f = "f"
     elif "n" in df_ieee.columns:
         f_values = df_ieee["n"]
+        key_f = "n"
     else:
         f_values = range(len(df_real))
+        key_f = None
+
+    # Find harmonic/order where Vcu is maximum but <= 1.1
+    line_max_vcu = None
+    if "Vcu" in df_ieee.columns and key_f is not None:
+        mask = df_ieee["Vcu"] <= 1.1
+        if mask.any():
+            idx_max = df_ieee.loc[mask, "Vcu"].idxmax()
+            line_max_vcu = int(df_ieee.loc[idx_max, key_f])
+
+    print("line_max_vcu (f or n) =", line_max_vcu)
 
     if export_tex:
-        ElectricalUtils.exportar_df_latex(df_real, tex_filename, f_values=f_values)
+        ElectricalUtils.exportar_df_latex(
+            df_real,
+            tex_filename,
+            f_values=f_values,
+            line_max_vcu=line_max_vcu,
+        )
     if export_xlsx:
-        ElectricalUtils.exportar_df_excel(df_real, filename=xlsx_filename, f_values=f_values)
+        ElectricalUtils.exportar_df_excel(
+            df_real,
+            filename=xlsx_filename,
+            f_values=f_values,
+        )
 
     return df_ieee, df_real
 
@@ -76,6 +99,7 @@ class MasterBankClasses:
         f_values: Optional[Iterable[int]] = None,
         export_tex: bool = True,
         export_xlsx: bool = True,
+        transpose: bool = False,
     ) -> Tuple[Table07DoubleWyeFig34, pd.DataFrame, pd.DataFrame]:
         """
         Build Table07DoubleWyeFig34 from dict, compute per-unit, convert to real units, export.
@@ -104,8 +128,9 @@ class MasterBankClasses:
         tex_filename: str = "tabela8_real.tex",
         xlsx_filename: str = "tabela8_real.xlsx",
         f_values: Optional[Iterable[int]] = None,
-        export_tex: bool = False,
-        export_xlsx: bool = False,
+        export_tex: bool = True,
+        export_xlsx: bool = True,
+        transpose: bool = False,
     ) -> Tuple[Tabela08HBridgeCalculada, pd.DataFrame, pd.DataFrame]:
         """
         Build Tabela08 (H-bridge, internal fuses), compute per-unit, convert to real units, export.
@@ -149,6 +174,7 @@ class MasterBankClasses:
         xlsx_filename: str = "tabela6_real.xlsx",
         export_tex: bool = True,
         export_xlsx: bool = True,
+        transpose: bool = False,
     ) -> Tuple[Table06HBridgeMinimal, pd.DataFrame, pd.DataFrame]:
         """
         Build Table06 (H-bridge, external fuses minimal), compute per-unit, convert to real units, export.
@@ -180,6 +206,7 @@ class MasterBankClasses:
         f_values: Optional[Iterable[int]] = None,
         export_tex: bool = True,
         export_xlsx: bool = True,
+        transpose: bool = False,
     ) -> Tuple[Table03DoubleWyeFig29, pd.DataFrame, pd.DataFrame]:
         """
         Build Table03 (double wye, external fuses), compute per-unit, convert to real units, export.

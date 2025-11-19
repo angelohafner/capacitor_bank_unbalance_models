@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 class Tabela08HBridgeCalculada:
@@ -55,7 +56,7 @@ class Tabela08HBridgeCalculada:
         if G not in (0, 1):
             raise ValueError("G must be 0 or 1.")
 
-        f_values = [0, 1, 2, 3, 4]
+        f_values = np.arange(self.Pa)
         resultados = []
 
         # Reference Cp(0)
