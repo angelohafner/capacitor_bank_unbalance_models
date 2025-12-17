@@ -10,7 +10,7 @@ class ElectricalUtils:
     # 0) Helpers
     # ============================================================
     @staticmethod
-    def _round_or_int(x: Any, decimals: int = 2) -> Any:
+    def _round_or_int(x: Any, decimals: int) -> Any:
         """Return ints without decimals; others rounded to `decimals`."""
         if isinstance(x, (int, float)):
             if float(x).is_integer():
@@ -21,7 +21,7 @@ class ElectricalUtils:
     @staticmethod
     def formatar_valores(valor: Any) -> Any:
         """Compat wrapper kept for external calls (2 decimals, ints preserved)."""
-        return ElectricalUtils._round_or_int(valor, 2)
+        return ElectricalUtils._round_or_int(valor, 4)
 
     # ============================================================
     # 1) Nominal (bank, unit, cell, element)
@@ -41,6 +41,7 @@ class ElectricalUtils:
         Returns a dict with SI units (V, A, F).
         """
         V_ll = float(dados_banco["tensao_trifasica_banco_V"])
+        V_rated  = float(dados_banco["V_rated"])
         Q_total = float(dados_banco["potencia_trifasica_banco_VAr"])
         f = float(dados_banco["frequencia_Hz"])
         S = int(dados_banco["S"])
@@ -81,6 +82,8 @@ class ElectricalUtils:
             "C_element": C_element,
             "V_element": V_element,
             "I_element": I_element,
+            "V_rated": V_rated,
+            "S": S,
         }
 
     # Optional base calculator (handy)
@@ -115,7 +118,7 @@ class ElectricalUtils:
 
         if "Vng" in df.columns:
             out["Vng"] = df["Vng"]
-            out["V_phase_V"] = df["Vng"] * resultados["V_phase"]
+            out["V_ng_V"] = df["Vng"] * resultados["V_phase"]
 
         if "In" in df.columns:
             out["In"] = df["In"]
@@ -139,8 +142,14 @@ class ElectricalUtils:
 
         if "Vcu" in df.columns:
             out["Vcu"] = df["Vcu"]
+            # real unit voltage on the capacitor unit (kV)
             out["Vcu_kV"] = df["Vcu"] * resultados["V_unit"] * 1e-3
 
+            # Vcu2 = (real unit voltage) / (rated unit voltage)
+            if "V_rated" in resultados and "S" in resultados:
+                V_unit_rated = (float(resultados["V_rated"]) / math.sqrt(3.0)) / float(resultados["S"])
+                factor = resultados["V_unit"] / V_unit_rated
+                out["Vcu2"] = df["Vcu"] * factor
 
         # Format: 2 decimals, keep integers without comma
         out = out.apply(lambda col: col.map(ElectricalUtils.formatar_valores))
@@ -201,7 +210,7 @@ class ElectricalUtils:
         add_pair(r"$C_u \, [\mathrm{pu}]$", "Cu", r"$C_u \, [\mu\mathrm{F}]$", "C_unit_uF")
 
         # Vng / V_phase
-        add_pair(r"$V_{ng} \, [\mathrm{pu}]$", "Vng", r"$V_{ng} \, [\mathrm{V}]$", "V_phase_V")
+        add_pair(r"$V_{ng} \, [\mathrm{pu}]$", "Vng", r"$V_{ng} \, [\mathrm{V}]$", "V_ng_V")
 
         # In / Ig (both pu and A)
         add_pair(r"$I_{n} \, [\mathrm{pu}]$", "In", r"$I_{n} \, [\mathrm{A}]$", "In_A")
@@ -212,6 +221,8 @@ class ElectricalUtils:
         add_pair(r"$V_{hn} \, [\mathrm{pu}]$", "Vhn", r"$V_{hn} \, [\mathrm{V}]$", "Vhn_V")
         add_pair(r"$I_{h} \, [\mathrm{pu}]$", "Ih", r"$I_{h} \, [\mathrm{A}]$", "Ih_A")
         add_pair(r"$V_{cu} \, [\mathrm{pu}]$", "Vcu", r"$V_{cu} \, [\mathrm{kV}]$", "Vcu_kV")
+
+        add_row(r"$V_{cu2} \, [\mathrm{pu2}]$", "Vcu2")
 
         # --- formatter for numbers ---
         def _fmt_cell(v, is_f_row: bool, decimals_: int):
@@ -353,7 +364,7 @@ class ElectricalUtils:
         add_pair("Cu (pu)", "Cu", "Cu (μF)", "C_unit_uF")
 
         # Vng
-        add_pair("Vng (pu)", "Vng", "Vng (V)", "V_phase_V")
+        add_pair("Vng (pu)", "Vng", "Vng (V)", "V_ng_V")
 
         # In / Ig
         add_pair("In (pu)", "In", "In (A)", "In_A")
@@ -364,6 +375,7 @@ class ElectricalUtils:
         add_pair("Vhn (pu)", "Vhn", "Vhn (V)", "Vhn_V")
         add_pair("Ih (pu)", "Ih", "Ih (A)", "Ih_A")
         add_pair("Vcu (pu)", "Vcu", "Vcu (kV)", "Vcu_kV")
+        add_row("Vcu2 (pu2)", "Vcu2")
 
         # Constrói DataFrame: linhas = labels; colunas = f
         data = {j: [r[1][j] for r in rows] for j in range(n_cols)}

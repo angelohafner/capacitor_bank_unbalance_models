@@ -1,5 +1,7 @@
 # Use a slim Python base image
 FROM python:3.12-slim
+# Upgrade pip to the latest version
+RUN python -m pip install --upgrade pip
 
 # System deps (TeX stack for PDF compilation) — comments in English only
 RUN apt-get update && apt-get install -y --no-install-recommends \

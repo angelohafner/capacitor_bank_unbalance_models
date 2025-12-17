@@ -1,7 +1,7 @@
 # master_bank_classes.py
+import logging
 from typing import Tuple, Optional, Iterable, Protocol, Dict, Any, Callable
 import os
-import streamlit as st
 import numpy as np
 import pandas as pd
 
@@ -35,7 +35,7 @@ def _postprocess_and_export(
     dados: Dict[str, Any],
     tex_filename: str,
     xlsx_filename: str,
-    f_values: Optional[Iterable[int]],
+    f_values: Iterable[int],
     export_tex: bool,
     export_xlsx: bool,
     real_units_hook: Optional[Callable[[pd.DataFrame, Dict[str, Any]], pd.DataFrame]] = None,
@@ -47,7 +47,6 @@ def _postprocess_and_export(
     """
     bases = ElectricalUtils.calcular_nominais_celula(dados)
     df_real = ElectricalUtils.converter_unidades(df_ieee, bases)
-
     if real_units_hook is not None:
         df_real = real_units_hook(df_real, bases)
 
@@ -69,7 +68,7 @@ def _postprocess_and_export(
             idx_max = df_ieee.loc[mask, "Vcu"].idxmax()
             line_max_vcu = int(df_ieee.loc[idx_max, key_f])
 
-    print("line_max_vcu (f or n) =", line_max_vcu)
+    logging.getLogger(__name__).info("line_max_vcu (f or n) = %s", line_max_vcu)
 
     if export_tex:
         ElectricalUtils.exportar_df_latex(
@@ -125,9 +124,9 @@ class MasterBankClasses:
     @staticmethod
     def compute_table08_from_dict(
         dados_nominais_banco: dict,
+        f_values: Iterable[int],
         tex_filename: str = "tabela8_real.tex",
         xlsx_filename: str = "tabela8_real.xlsx",
-        f_values: Optional[Iterable[int]] = None,
         export_tex: bool = True,
         export_xlsx: bool = True,
         transpose: bool = False,

@@ -56,7 +56,6 @@ class Tabela08HBridgeCalculada:
         if G not in (0, 1):
             raise ValueError("G must be 0 or 1.")
 
-        f_values = np.arange(self.Pa)
         resultados = []
 
         # Reference Cp(0)
@@ -64,6 +63,7 @@ class Tabela08HBridgeCalculada:
         Chn0 = self._Chn(Cu0)
         Cp0 = self._Cp(Chn0)
 
+        f_values = np.arange(self.N).tolist()
         for f in f_values:
             Cu = self._Cu(f)
             Chn = self._Chn(Cu)

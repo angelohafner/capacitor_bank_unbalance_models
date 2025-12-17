@@ -5,13 +5,17 @@ import json
 import io
 import streamlit as st
 import pandas as pd
+import zipfile
+from bank_diagram import BankDiagram
+from h_bridge_drawing import HCompleteWithNeutralCT, validate_h_bridge_inputs
+
 
 
 def ensure_export_dir():
     """Create 'exported' folder if it does not exist."""
     os.makedirs("./tex_files/tables", exist_ok=True)
 
-def show_topology_figure(topologia: str):
+def show_topology_figure(dados_nominais_banco):
     """Show figure for the selected topology (if available)."""
     figs_dir = "./tex_files/figs"
     mapping = {
@@ -20,20 +24,84 @@ def show_topology_figure(topologia: str):
         "yy_internal_fuses": "Figure34-yy_internal_fuses.png",
         "h_bridge_internal_fuses": "Figure36-h_bridge_internal_fuses.png",
     }
-    filename = mapping.get(topologia)
-    if not filename:
-        st.warning(f"No figure defined for topology '{topologia}'")
-        return
+    topologia = dados_nominais_banco["topologia_protecao"]
+    if topologia == "h_bridge_external_fuses" or topologia == "h_bridge_internal_fuses":
+        filename = None
+    else:
+        filename = mapping.get(topologia)
+        if not filename:
+            st.warning(f"No figure defined for topology '{topologia}'")
+            return
 
-    path = os.path.join(figs_dir, filename)
-    if not os.path.exists(path):
-        st.error(f"Figure not found: {path}")
-        return
+        path = os.path.join(figs_dir, filename)
+        if not os.path.exists(path):
+            st.error(f"Figure not found: {path}")
+            return
 
     if topologia == "h_bridge_external_fuses" or topologia == "h_bridge_internal_fuses":
-        left, center, right = st.columns([1, 4, 1])
-        with center:
-            st.image(path, caption=f"Topology: {topologia}", use_container_width=True)
+        # Draw dynamically (adapted from ponte_h_desenho.py)
+        S = int(dados_nominais_banco["S"])
+        St = int(dados_nominais_banco["St"])
+        Pt = int(dados_nominais_banco["Pt"])
+        Pa = int(dados_nominais_banco["Pa"])
+        # External-fuse topology does not provide P; use a reasonable default for drawing.
+        if "P" in dados_nominais_banco:
+            P = int(dados_nominais_banco["P"])
+        else:
+            P = 2
+
+        result = validate_h_bridge_inputs(S=S, St=St, Pt=Pt, Pa=Pa, P=P)
+        if not result.is_valid:
+            st.error("Parâmetros inválidos para o desenho do arranjo H-Bridge:")
+            for msg in result.errors:
+                st.write("- " + msg)
+            if len(result.warnings) > 0:
+                st.warning("Avisos:")
+                for msg in result.warnings:
+                    st.write("- " + msg)
+            return
+
+        if len(result.warnings) > 0:
+            with st.expander("Avisos do desenho (H-Bridge)", expanded=False):
+                for msg in result.warnings:
+                    st.write("- " + msg)
+
+        fuse_enabled = False #(topologia == "h_bridge_internal_fuses")
+
+        h = HCompleteWithNeutralCT(
+            Pt=Pt,
+            Pa=Pa,
+            P=P,
+            S=S,
+            St=St,
+            fuse_enabled=fuse_enabled,
+        )
+
+        fig = h.make_figure(title=f"H-Bridge ({'FI' if fuse_enabled else 'FE'})")
+        st.plotly_chart(fig, use_container_width=True)
+    elif topologia == "yy_internal_fuses": #, "yy_external_fuses"
+        diagram = BankDiagram(
+            P=dados_nominais_banco["P"],
+            S=dados_nominais_banco["S"],
+            Pt=dados_nominais_banco["Pt"],
+            Pa_left=dados_nominais_banco["Pa"],
+            x0=0.0,
+            y0=0.0,
+        )
+        fig = diagram.make_figure()
+        st.plotly_chart(fig, use_container_width=True)
+    elif topologia == "yy_external_fuses":
+        diagram = BankDiagram(
+            # P=Pa para poder aproveitar classe dos fusiveis internos
+            P=dados_nominais_banco["Pa"],
+            S=dados_nominais_banco["S"],
+            Pt=dados_nominais_banco["Pt"],
+            Pa_left=dados_nominais_banco["Pa"],
+            x0=0.0,
+            y0=0.0,
+        )
+        fig = diagram.make_figure()
+        st.plotly_chart(fig, use_container_width=True)
     else:
         st.image(path, caption=f"Topology: {topologia}", use_container_width=True)
 
@@ -72,24 +140,13 @@ def show_downloads(
     payload_for_dict=None,
     json_file: str | None = None,
     txt_file: str | None = None,
+    acp_file: str | None = None,
 ):
     """
-    Exibe botões de download para arquivos XLSX, TEX, PDF, JSON e TXT.
-
-    Agora cada arquivo pode ter o nome definido individualmente.
-    Se não for fornecido, tenta usar base_name como padrão.
-
-    Parâmetros
-    ----------
-    base_name : str, opcional
-        Nome base antigo (continua funcionando).
-    xlsx_file, tex_file, pdf_file, json_file, txt_file : str, opcionais
-        Nomes individuais dos arquivos.
-    payload_for_dict : dict/DataFrame opcional
-        Conteúdo para exportar via JSON/TXT.
+    Single ZIP download button for all available files.
     """
 
-    # ====== 1) Resolver nomes ======
+    # Resolve default names
     if base_name:
         if xlsx_file is None:
             xlsx_file = f"{base_name}.xlsx"
@@ -100,48 +157,45 @@ def show_downloads(
         if txt_file is None:
             txt_file = f"{base_name}.txt"
 
-    # ====== 2) Caminhos completos ======
+    # Build full paths
     xlsx_path = os.path.join("tex_files", "tables", xlsx_file) if xlsx_file else None
     tex_path  = os.path.join("tex_files", "tables", tex_file)  if tex_file else None
+    acp_path  = os.path.join("atp_files", acp_file)            if acp_file else None
 
-    # ====== 3) XLSX ======
-    if xlsx_path and os.path.exists(xlsx_path):
-        with open(xlsx_path, "rb") as f:
-            st.download_button(
-                label=f"⬇️ Baixar {xlsx_file}",
-                data=f,
-                file_name=xlsx_file,
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            )
+    # Create ZIP in memory
+    zip_buffer = io.BytesIO()
+    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
 
-    # ====== 4) TEX ======
-    if tex_path and os.path.exists(tex_path):
-        with open(tex_path, "rb") as f:
-            st.download_button(
-                label=f"⬇️ Baixar {tex_file}",
-                data=f,
-                file_name=tex_file,
-                mime="application/x-tex",
-            )
+        # Add XLSX
+        if xlsx_path and os.path.exists(xlsx_path):
+            zipf.write(xlsx_path, arcname=xlsx_file)
 
-    # ====== 6) JSON e TXT ======
-    if payload_for_dict is not None:
-        if json_file:
+        # Add TEX
+        if tex_path and os.path.exists(tex_path):
+            zipf.write(tex_path, arcname=tex_file)
+
+        # Add ACP
+        if acp_path and os.path.exists(acp_path):
+            zipf.write(acp_path, arcname=os.path.basename(acp_path))
+
+        # Add JSON from payload
+        if payload_for_dict is not None and json_file:
             json_bytes = _serialize_to_json_bytes(payload_for_dict)
-            st.download_button(
-                label=f"⬇️ Baixar {json_file}",
-                data=io.BytesIO(json_bytes),
-                file_name=json_file,
-                mime="application/json",
-            )
+            zipf.writestr(json_file, json_bytes)
 
-        if txt_file:
+        # Add TXT from payload
+        if payload_for_dict is not None and txt_file:
             txt_bytes = _serialize_to_txt_bytes(payload_for_dict)
-            st.download_button(
-                label=f"⬇️ Baixar {txt_file}",
-                data=io.BytesIO(txt_bytes),
-                file_name=txt_file,
-                mime="text/plain",
-            )
+            zipf.writestr(txt_file, txt_bytes)
+
+    zip_buffer.seek(0)
+
+    # Single button
+    st.download_button(
+        label="⬇️ Baixar todos os arquivos",
+        data=zip_buffer,
+        file_name=f"{base_name or 'files'}.zip",
+        mime="application/zip",
+    )
 
 
