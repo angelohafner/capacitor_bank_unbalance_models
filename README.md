@@ -1,86 +1,204 @@
-# Capacitor Bank Unbalance Models
 
-Aplicativo Streamlit e classes em Python para modelagem, análise e proteção de bancos de capacitores sob condições de desbalanceamento, conforme a norma **IEEE C37.99**.
+# Capacitor Bank Unbalance Analysis – IEEE C37.99-2012
 
-Streamlit app and Python classes for modeling, analysis, and protection of capacitor banks under unbalance conditions according to **IEEE C37.99**.
+This project implements a **Streamlit-based engineering tool** for **analysis, validation, and visualization of shunt capacitor bank arrangements**, fully aligned with **IEEE C37.99-2012 – Guide for the Protection of Shunt Capacitor Banks**.
 
----
-
-## 🧩 Funcionalidades / Features
-
-- Cálculo automático de tensões e correntes em topologias:
-  - `yy_internal_fuses`
-  - `yy_external_fuses`
-  - `h_bridge_internal_fuses`
-  - `h_bridge_external_fuses`
-- Geração de tabelas IEEE e reais (`Table 6–8`)
-- Exportação para **Excel (.xlsx)** e **LaTeX (.tex)**
-- Interface web interativa via **Streamlit**
-- Execução modular com classes Python reutilizáveis
+Unlike purely illustrative tools, this application **computes neutral current and neutral voltage**, using the selected bank topology and electrical parameters, and supports protection-oriented studies.
 
 ---
 
-## ⚙️ Instalação / Installation
+## 1. Purpose
 
-```bash
-# Clone o repositório / Clone the repository
-git clone https://github.com/angelohafner/capacitor_bank_unbalance_models.git
-cd capacitor_bank_unbalance_models
+The main objectives of this project are:
 
-# Crie um ambiente virtual / Create a virtual environment
-python -m venv .venv
-source .venv/bin/activate  # (Linux/macOS)
-# ou / or
-.venv\Scripts\activate     # (Windows)
+- Model different **capacitor bank topologies** used in medium- and high-voltage systems;
+- **Compute neutral current and neutral voltage** according to IEEE C37.99 principles;
+- Enforce **topology-dependent electrical and geometrical constraints**;
+- Provide clear **Plotly-based electrical diagrams** suitable for engineering analysis;
+- Serve as a foundation for protection settings, validation, and reporting.
 
-# Instale as dependências / Install dependencies
-pip install -r requirements.txt
+The focus is on **steady-state unbalance behavior**, not on electromagnetic transients.
+
+---
+
+## 2. Normative Basis – IEEE C37.99-2012
+
+IEEE C37.99-2012 establishes methodologies for:
+
+- Detection of **capacitor unit failures**;
+- Evaluation of **neutral current (Iₙ)** and **neutral voltage (Vₙ)**;
+- Distinction between **single-star, double-star, and H-bridge arrangements**;
+- Impact of **internal vs. external fuses** on sensitivity and measurement;
+- Proper use of **grounding transformers** and neutral connections.
+
+This project follows the standard by:
+
+- Applying **different calculation and validation rules per topology**;
+- Computing neutral quantities consistent with the selected arrangement;
+- Explicitly modeling the neutral point and grounding path when applicable;
+- Avoiding invalid parameter combinations that would violate IEEE assumptions.
+
+---
+
+## 3. Implemented Topologies
+
+### 3.1 `yy_internal_fuses`
+- Double-star arrangement
+- Internal fuses
+- Uses parameters:
+  - `Pa`, `P`, `Pt`, `S`
+- Enforces integer relationship `Pa / P`
+- Computes:
+  - Neutral current
+  - Neutral voltage
+
+---
+
+### 3.2 `yy_external_fuses`
+- Double-star arrangement
+- External fuses
+- **Does not use parameter `P`**
+- No `Pa / P` validation is applied
+- Neutral quantities are computed using IEEE external-fuse assumptions
+
+---
+
+### 3.3 `h_bridge_internal`
+- H-bridge arrangement
+- Internal fuses
+- Uses parameters:
+  - `Pt`, `Pa`, `P`, `S`, `St`
+- Dedicated validation logic
+- High sensitivity to single-unit failures
+- Computes neutral current and voltage per bridge imbalance
+
+---
+
+### 3.4 `y_internal_fuses`
+- Single-star arrangement
+- Internal fuses
+- Fixed parameters:
+  - `Pa = 1`
+  - `Pt = 1`
+- User input is intentionally locked
+- Includes:
+  - Neutral bus
+  - Grounding transformer (`TR`)
+  - Explicit ground symbol
+- Neutral current and voltage are calculated
+- Diagram rendered at reduced scale (50%) for clarity
+
+---
+
+## 4. Electrical Quantities Calculated
+
+The application calculates, depending on topology:
+
+- Neutral current (Iₙ)
+- Neutral voltage (Vₙ)
+- Phase and branch unbalance indicators
+- Per-unit and absolute quantities (as configured)
+
+These values are suitable for:
+
+- Protection sensitivity analysis
+- Alarm and trip threshold definition
+- Comparative studies between topologies
+
+---
+
+## 5. Project Architecture
+
+### Main Files
+
+```
+main.py
+main_part_1.py
+utils_streamlit.py
+validators.py
+bank_diagram.py
 ```
 
----
+### Responsibilities
 
-## 🚀 Execução / Run
+- **`bank_diagram.py`**
+  - Core electrical modeling
+  - Neutral current and voltage computation
+  - Plotly-based diagram generation
+  - Raises errors for invalid arrangements
 
-```bash
-streamlit run main.py
-```
+- **`validators.py`**
+  - Topology-specific validation rules
+  - Returns `ValidationResult` objects
 
-O aplicativo será aberto no navegador em:  
-**http://localhost:8501**
+- **`utils_streamlit.py`**
+  - Dispatches validation by topology
+  - Connects inputs to diagram and calculations
 
----
-
-## 📄 Estrutura do Projeto / Project Structure
-
-```
-capacitor_bank_unbalance_models/
-├── main.py                    # Interface principal Streamlit
-├── master_bank_classes.py     # Classes e métodos principais de cálculo
-├── input_widgets.py           # Componentes de entrada Streamlit
-├── utils_streamlit.py         # Funções auxiliares (exportação, figuras, etc.)
-├── requirements.txt           # Dependências do projeto
-└── export/                    # Arquivos gerados (.xlsx, .tex)
-```
+- **`main_part_1.py`**
+  - Streamlit UI
+  - Parameter inputs
+  - Context management
 
 ---
 
-## 📘 Referência / Reference
+## 6. Validation Strategy
 
-- IEEE C37.99 — *Guide for the Protection of Shunt Capacitor Banks*  
-- Implementação inspirada nas Tabelas 6–8 da norma IEEE C37.99-2012
+Validation is **explicitly topology-based**, following IEEE C37.99 logic:
+
+- No generic validation across topologies
+- Each arrangement defines:
+  - Required parameters
+  - Forbidden parameters
+  - Structural constraints
+
+This avoids:
+- False errors
+- Hidden assumptions
+- Misinterpretation of IEEE rules
 
 ---
 
-## 👨‍💻 Autor / Author
+## 7. Visualization
 
-**Angelo Alfredo Hafner**  
-Engenheiro Eletricista – DAX-Energy  
-https://dax.energy/
-[GitHub](https://github.com/angelohafner)
+- All diagrams are generated **programmatically via Plotly**
+- No static images are used
+- Electrical symbols:
+  - True capacitor symbols (parallel plates)
+  - Series connections without illegal conductors
+  - Explicit neutral and grounding paths
 
 ---
 
-## 🧾 Licença / License
+## 8. Scope and Limitations
 
-Este projeto é distribuído sob a licença MIT.  
-This project is distributed under the MIT License.
+Included:
+- Steady-state unbalance analysis
+- Neutral current and voltage calculation
+- Structural validation
+
+Not included (by design):
+- Electromagnetic transient simulation
+- Switching overvoltages
+- Insulation coordination
+- Relay time grading
+
+---
+
+## 9. Intended Use
+
+This tool is suitable for:
+
+- Engineering studies of shunt capacitor banks
+- Protection philosophy definition
+- Academic and professional analysis
+- Pre-design validation before ATP/EMTP studies
+
+---
+
+## 10. Standards and References
+
+- IEEE C37.99-2012  
+  *Guide for the Protection of Shunt Capacitor Banks*
+
+---
