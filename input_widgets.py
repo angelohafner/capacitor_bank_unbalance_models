@@ -40,7 +40,43 @@ def get_dados_nominais_banco(topologia: str):
     st.subheader("Arranjo")
     c1, c2, c3 = st.columns(3)
 
-    if topologia == "yy_internal_fuses":
+    
+    if topologia == "y_internal_fuses":
+        with c1:
+            S  = st.number_input("Grupos em série por fase (S):", 1, 20, 4)
+            Pt = st.number_input(
+                label="Unidades em paralelo por fase (Pt):",
+                value=1,
+                disabled=True,
+            )
+        with c2:
+            Pa = 1
+            st.number_input(
+                label="Unidades paralelas fase afetada (Pa) (Pt=Pa):",
+                value=1,
+                disabled=True,
+            )
+            P  = st.number_input(
+                label="Unidades paralelas ramo afetado (P):",
+                value=1,
+                disabled=True,
+            )
+        with c3:
+            N  = st.number_input("Elementos em paralelo por célula (N):", 1, 50, 14)
+            Su = st.number_input("Elementos em série por célula (Su):", 1, 10, 3)
+
+        return {
+            "tensao_trifasica_banco_V": tensao_trifasica_banco_V,
+            "potencia_trifasica_banco_VAr": potencia_trifasica_banco_VAr,
+            "V_rated": V_rated,
+            "Q_rated": Q_rated,
+            "frequencia_Hz": frequencia_Hz,
+            "S": S, "Pt": Pt, "Pa": Pa, "P": P, "N": N, "Su": Su,
+            "G": G,
+            "topologia_protecao": "y_internal_fuses",
+        }
+
+    elif topologia == "yy_internal_fuses":
         with c1:
             S  = st.number_input("Grupos em série por fase (S):", 1, 20, 4)
             Pt = st.number_input("Unidades em paralelo por fase (Pt):", 1, 50, 11)

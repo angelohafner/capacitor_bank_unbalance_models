@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 
 from yy_internal_fuses import Table07DoubleWyeFig34
+from y_internal_fuses import Table07SingleWyeInternalFuses
 from h_bridge_internal_fuses import Tabela08HBridgeCalculada
 from h_bridge_external_fuses import Table06HBridgeMinimal
 from yy_external_fuses import Table03DoubleWyeFig29
@@ -106,6 +107,39 @@ class MasterBankClasses:
         """
         d = _coerce_inputs(dados_nominais_banco, keys_int=("S", "Pt", "Pa", "P", "N", "Su", "G"))
         tabela7 = Table07DoubleWyeFig34(
+            S=d["S"], Pt=d["Pt"], Pa=d["Pa"], P=d["P"], N=d["N"], Su=d["Su"]
+        )
+        df_ieee = tabela7.calcular(G=d["G"])
+        df_ieee, df_real = _postprocess_and_export(
+            df_ieee=df_ieee,
+            dados=d,
+            tex_filename=tex_filename,
+            xlsx_filename=xlsx_filename,
+            f_values=f_values,
+            export_tex=export_tex,
+            export_xlsx=export_xlsx,
+            real_units_hook=None,
+        )
+        return tabela7, df_ieee, df_real
+
+
+    @staticmethod
+    def compute_table07_single_from_dict(
+        dados_nominais_banco: dict,
+        tex_filename: str = "tabela7y_real.tex",
+        xlsx_filename: str = "tabela7y_real.xlsx",
+        f_values: Optional[Iterable[int]] = None,
+        export_tex: bool = True,
+        export_xlsx: bool = True,
+        transpose: bool = False,
+    ) -> Tuple[Table07SingleWyeInternalFuses, pd.DataFrame, pd.DataFrame]:
+        """
+        Build Table07SingleWyeInternalFuses from dict, compute per-unit, convert to real units, export.
+        Expected keys: S, Pt, Pa, P, N, Su, G, tensao_trifasica_banco_V, potencia_trifasica_banco_VAr, frequencia_Hz.
+        Note: For this topology, Pt must be equal to Pa.
+        """
+        d = _coerce_inputs(dados_nominais_banco, keys_int=("S", "Pt", "Pa", "P", "N", "Su", "G"))
+        tabela7 = Table07SingleWyeInternalFuses(
             S=d["S"], Pt=d["Pt"], Pa=d["Pa"], P=d["P"], N=d["N"], Su=d["Su"]
         )
         df_ieee = tabela7.calcular(G=d["G"])

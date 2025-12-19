@@ -48,6 +48,7 @@ def run_main_part_1():
             "Topologia de proteção:",
             [
                 "yy_internal_fuses",
+                "y_internal_fuses",
                 "h_bridge_internal_fuses",
                 "yy_external_fuses",
                 "h_bridge_external_fuses",

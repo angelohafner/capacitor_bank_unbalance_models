@@ -6,8 +6,10 @@ import io
 import streamlit as st
 import pandas as pd
 import zipfile
-from bank_diagram import BankDiagram
-from h_bridge_drawing import HCompleteWithNeutralCT, validate_h_bridge_inputs
+from bank_diagram import BankDiagram, SingleWyeBankDiagram
+from h_bridge_drawing import HCompleteWithNeutralCT
+from validators import validate_inputs
+from y_internal_fuses_diagram import ThreePhaseYInternalFusesDiagram
 
 
 
@@ -17,56 +19,65 @@ def ensure_export_dir():
 
 def show_topology_figure(dados_nominais_banco):
     """Show figure for the selected topology (if available)."""
-    figs_dir = "./tex_files/figs"
-    mapping = {
-        "yy_external_fuses": "Figure29-yy_external_fuses.png",
-        "h_bridge_external_fuses": "Figure32-h_bridge_external_fuses.png",
-        "yy_internal_fuses": "Figure34-yy_internal_fuses.png",
-        "h_bridge_internal_fuses": "Figure36-h_bridge_internal_fuses.png",
-    }
     topologia = dados_nominais_banco["topologia_protecao"]
-    if topologia == "h_bridge_external_fuses" or topologia == "h_bridge_internal_fuses":
-        filename = None
-    else:
-        filename = mapping.get(topologia)
-        if not filename:
-            st.warning(f"No figure defined for topology '{topologia}'")
+
+    # ---------------- Plotly: single-wye internal fuses ----------------
+    if topologia == "y_internal_fuses":
+        S = int(dados_nominais_banco.get("S", 4))
+        diagram = ThreePhaseYInternalFusesDiagram(S=S)
+        # Half-size (only for this topology)
+        fig = diagram.make_figure(width=450, height=350)
+        st.plotly_chart(fig, use_container_width=False)
+        return
+
+    # ---------------- Plotly: double-wye (yy) diagrams ----------------
+    if topologia == "yy_internal_fuses":
+        P = int(dados_nominais_banco.get("P", 3))
+        S = int(dados_nominais_banco.get("S", 4))
+        Pt = int(dados_nominais_banco.get("Pt", 11))
+        Pa = int(dados_nominais_banco.get("Pa", 6))
+
+        result = validate_inputs(topology=topologia, data=dados_nominais_banco)
+        if result.is_valid is False:
+            st.warning("\n".join(result.errors))
             return
 
-        path = os.path.join(figs_dir, filename)
-        if not os.path.exists(path):
-            st.error(f"Figure not found: {path}")
+        diagram = BankDiagram(P=P, S=S, Pt=Pt, Pa_left=Pa)
+        fig = diagram.make_figure()
+        st.plotly_chart(fig, use_container_width=True)
+        return
+
+    if topologia == "yy_external_fuses":
+        # External-fuse case does not provide P.
+        # Force P=1 so Pa/P is always integer and the drawing does not depend on P.
+        P = 1
+        S = int(dados_nominais_banco.get("S", 4))
+        Pt = int(dados_nominais_banco.get("Pt", 14))
+        Pa = int(dados_nominais_banco.get("Pa", 8))
+
+        result = validate_inputs(topology=topologia, data=dados_nominais_banco)
+        if result.is_valid is False:
+            st.warning("\n".join(result.errors))
             return
 
-    if topologia == "h_bridge_external_fuses" or topologia == "h_bridge_internal_fuses":
-        # Draw dynamically (adapted from ponte_h_desenho.py)
-        S = int(dados_nominais_banco["S"])
-        St = int(dados_nominais_banco["St"])
-        Pt = int(dados_nominais_banco["Pt"])
-        Pa = int(dados_nominais_banco["Pa"])
-        # External-fuse topology does not provide P; use a reasonable default for drawing.
-        if "P" in dados_nominais_banco:
-            P = int(dados_nominais_banco["P"])
-        else:
-            P = 2
+        diagram = BankDiagram(P=P, S=S, Pt=Pt, Pa_left=Pa)
+        fig = diagram.make_figure()
+        st.plotly_chart(fig, use_container_width=True)
+        return
 
-        result = validate_h_bridge_inputs(S=S, St=St, Pt=Pt, Pa=Pa, P=P)
-        if not result.is_valid:
-            st.error("Parâmetros inválidos para o desenho do arranjo H-Bridge:")
-            for msg in result.errors:
-                st.write("- " + msg)
-            if len(result.warnings) > 0:
-                st.warning("Avisos:")
-                for msg in result.warnings:
-                    st.write("- " + msg)
+    # ---------------- Plotly: H-bridge diagrams ----------------
+    if topologia == "h_bridge_internal_fuses" or topologia == "h_bridge_external_fuses":
+        S = int(dados_nominais_banco.get("S", 7))
+        St = int(dados_nominais_banco.get("St", 3))
+        Pt = int(dados_nominais_banco.get("Pt", 9))
+        Pa = int(dados_nominais_banco.get("Pa", 5))
+        P = int(dados_nominais_banco.get("P", 2))
+
+        # Validate inputs (show message instead of crashing)
+        result = validate_inputs(topology=topologia, data=dados_nominais_banco)
+        if result.is_valid is False:
+            st.warning("\n".join(result.errors))
             return
-
-        if len(result.warnings) > 0:
-            with st.expander("Avisos do desenho (H-Bridge)", expanded=False):
-                for msg in result.warnings:
-                    st.write("- " + msg)
-
-        fuse_enabled = False #(topologia == "h_bridge_internal_fuses")
 
         h = HCompleteWithNeutralCT(
             Pt=Pt,
@@ -74,38 +85,19 @@ def show_topology_figure(dados_nominais_banco):
             P=P,
             S=S,
             St=St,
-            fuse_enabled=fuse_enabled,
+            gap_between_legs=14.0,
+            left_internal_gap=8.0,
+            right_group_gap=9.0,
+            bus_stub=7.0,
+            ct_box_w=3.2,
+            ct_box_h=1.4,
         )
 
-        fig = h.make_figure(title=f"H-Bridge ({'FI' if fuse_enabled else 'FE'})")
+        fig = h.make_figure(title="H-Bridge", width=1600, height=450)
         st.plotly_chart(fig, use_container_width=True)
-    elif topologia == "yy_internal_fuses": #, "yy_external_fuses"
-        diagram = BankDiagram(
-            P=dados_nominais_banco["P"],
-            S=dados_nominais_banco["S"],
-            Pt=dados_nominais_banco["Pt"],
-            Pa_left=dados_nominais_banco["Pa"],
-            x0=0.0,
-            y0=0.0,
-        )
-        fig = diagram.make_figure()
-        st.plotly_chart(fig, use_container_width=True)
-    elif topologia == "yy_external_fuses":
-        diagram = BankDiagram(
-            # P=Pa para poder aproveitar classe dos fusiveis internos
-            P=dados_nominais_banco["Pa"],
-            S=dados_nominais_banco["S"],
-            Pt=dados_nominais_banco["Pt"],
-            Pa_left=dados_nominais_banco["Pa"],
-            x0=0.0,
-            y0=0.0,
-        )
-        fig = diagram.make_figure()
-        st.plotly_chart(fig, use_container_width=True)
-    else:
-        st.image(path, caption=f"Topology: {topologia}", use_container_width=True)
+        return
 
-
+    st.warning(f"No figure defined for topology '{topologia}'")
 def _serialize_to_json_bytes(obj) -> bytes:
     """Serialize a dict/DataFrame/Series/list to JSON bytes (UTF-8)."""
     if isinstance(obj, pd.DataFrame):
@@ -197,5 +189,3 @@ def show_downloads(
         file_name=f"{base_name or 'files'}.zip",
         mime="application/zip",
     )
-
-

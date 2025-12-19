@@ -153,6 +153,7 @@ class LatexReportGenerator:
                 lambda v: (
                     {
                         "yy_internal_fuses":  "Fusíveis Internos Dupla Estrela",
+                        "y_internal_fuses":   "Fusíveis Internos Estrela Simples",
                         "yy_external_fuses":  "Fusíveis Externos Dupla Estrela",
                         "h_bridge_internal_fuses": "Fusíveis Internos Ponte H",
                         "h_bridge_external_fuses": "Fusíveis Externos Ponte H",

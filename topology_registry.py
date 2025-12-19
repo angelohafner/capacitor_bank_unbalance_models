@@ -32,7 +32,7 @@ class TopologyConfig:
         }
 
         # Table 07/08 require f_values (depends on N).
-        if self.key in ("yy_internal_fuses", "h_bridge_internal_fuses"):
+        if self.key in ("yy_internal_fuses", "y_internal_fuses", "h_bridge_internal_fuses"):
             N = int(nominal_data["N"])
             kwargs["f_values"] = np.arange(N - 1).tolist()
 
@@ -50,6 +50,17 @@ def get_topology_configs() -> Dict[str, TopologyConfig]:
             table_xlsx_filename="tabela7_real.xlsx",
             download_xlsx="tabela7_real.xlsx",
             download_acp="TEMPLATE__FI_YY.acp",
+        ),
+
+        "y_internal_fuses": TopologyConfig(
+            key="y_internal_fuses",
+            label="Estrela simples com fusíveis internos",
+            compute_fn=MasterBankClasses.compute_table07_single_from_dict,
+            template_tex="tex_files/templates/TEMPLATE__FI.tex",
+            table_tex_filename="tabela7y_real.tex",
+            table_xlsx_filename="tabela7y_real.xlsx",
+            download_xlsx="tabela7y_real.xlsx",
+            download_acp=None,
         ),
         "h_bridge_internal_fuses": TopologyConfig(
             key="h_bridge_internal_fuses",

@@ -956,3 +956,85 @@ class BankDiagram:
 #
 # fig = diagram.make_figure()
 # fig.show()
+
+class SingleWyeBankDiagram(BankDiagram):
+    """Single-wye diagram using the same drawing primitives as BankDiagram.
+
+    The original BankDiagram is a double-wye arrangement (left + right branches).
+    This subclass draws only the left branch and connects its star point to the
+    CT/TR/ground stack.
+    """
+
+    def _add_phase_buses_single(self, shapes, annotations, left_branch):
+        all_x_centers = [left_branch.x_centers[0], left_branch.x_centers[1], left_branch.x_centers[2]]
+        all_y_tops = [left_branch.y_top_globals[0], left_branch.y_top_globals[1], left_branch.y_top_globals[2]]
+
+        x_bus_left = min(all_x_centers) - self.phase_label_offset
+        x_bus_right = max(all_x_centers) + self.phase_label_offset
+        y_top_max = max(all_y_tops)
+
+        y_bus_A = y_top_max + self.phase_bus_offset + 0.0 * self.phase_bus_spacing
+        y_bus_B = y_top_max + self.phase_bus_offset + 1.0 * self.phase_bus_spacing
+        y_bus_C = y_top_max + self.phase_bus_offset + 2.0 * self.phase_bus_spacing
+
+        shapes.append(self._line(x0=x_bus_left, x1=x_bus_right, y0=y_bus_A, y1=y_bus_A))
+        shapes.append(self._line(x0=x_bus_left, x1=x_bus_right, y0=y_bus_B, y1=y_bus_B))
+        shapes.append(self._line(x0=x_bus_left, x1=x_bus_right, y0=y_bus_C, y1=y_bus_C))
+
+        shapes.append(self._line(x0=left_branch.x_centers[0], x1=left_branch.x_centers[0], y0=y_bus_A, y1=left_branch.y_top_globals[0] + self.phase_drop_gap))
+        shapes.append(self._line(x0=left_branch.x_centers[1], x1=left_branch.x_centers[1], y0=y_bus_B, y1=left_branch.y_top_globals[1] + self.phase_drop_gap))
+        shapes.append(self._line(x0=left_branch.x_centers[2], x1=left_branch.x_centers[2], y0=y_bus_C, y1=left_branch.y_top_globals[2] + self.phase_drop_gap))
+
+        annotations.append(dict(x=x_bus_left - 0.4, y=y_bus_A, text="A", showarrow=False, xanchor="right", yanchor="middle"))
+        annotations.append(dict(x=x_bus_left - 0.4, y=y_bus_B, text="B", showarrow=False, xanchor="right", yanchor="middle"))
+        annotations.append(dict(x=x_bus_left - 0.4, y=y_bus_C, text="C", showarrow=False, xanchor="right", yanchor="middle"))
+
+        y_phase_top = max(y_bus_A, y_bus_B, y_bus_C)
+        y_phase_bot = min(y_bus_A, y_bus_B, y_bus_C)
+        return y_phase_top, y_phase_bot
+
+    def build(self):
+        left_branch, shapes_l, bounds_l = self._build_left_branch()
+
+        shapes_all = []
+        annotations = []
+        shapes_all = shapes_all + shapes_l
+
+        x_center = left_branch.x_centers[1]
+        x_l = x_center - self.ct_w
+        x_r = x_center + self.ct_w
+
+        y_star = left_branch.y_star
+
+        y_ground_low = self._add_ct_tr_ground(
+            shapes=shapes_all,
+            annotations=annotations,
+            x_l=x_l,
+            x_r=x_r,
+            y_star=y_star,
+        )
+
+        y_phase_top, y_phase_bot = self._add_phase_buses_single(
+            shapes=shapes_all,
+            annotations=annotations,
+            left_branch=left_branch,
+        )
+
+        x_min = bounds_l["x_min"]
+        x_max = bounds_l["x_max"]
+
+        y_min = bounds_l["y_min"]
+        if y_ground_low - 0.8 < y_min:
+            y_min = y_ground_low - 0.8
+        if y_phase_bot - 0.8 < y_min:
+            y_min = y_phase_bot - 0.8
+
+        y_max = bounds_l["y_max"]
+        if y_phase_top + 0.8 > y_max:
+            y_max = y_phase_top + 0.8
+
+        self._shapes = shapes_all
+        self._annotations = annotations
+        self._bounds = {"x_min": x_min, "x_max": x_max, "y_min": y_min, "y_max": y_max}
+
+        return self._shapes, self._bounds, self._annotations
