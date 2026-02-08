@@ -1,12 +1,12 @@
 # Comments in English only
 from __future__ import annotations
-
+from pathlib import Path
 import streamlit as st
 
-from input_widgets import get_dados_nominais_banco
-from utils_streamlit import ensure_export_dir, show_topology_figure
-from latex_report_generator import LatexReportGenerator
-from validators import validate_nominal_data, NominalDataError
+from ui.input_widgets import get_dados_nominais_banco
+from ui.utils_streamlit import ensure_export_dir, show_topology_figure
+from reports.latex_report_generator import LatexReportGenerator
+from validation.validators import validate_nominal_data, NominalDataError
 
 
 def run_main_part_1():
@@ -73,12 +73,13 @@ def run_main_part_1():
             secondary_voltage_tp = st.selectbox(
                 "Tensão secundária [V]:", tp_secondary_options
             )
-            secondary_current_tc = None
+
 
     # ---------------- Build nominal dictionary from UI ----------------
     dados_nominais_banco = get_dados_nominais_banco(topologia)
 
     if not dados_nominais_banco:
+        st.error("Preencha os dados nominais do banco para continuar.")
         st.stop()
 
     # ---------------- Validation ----------------

@@ -1,7 +1,6 @@
 # Comments in English only
 from __future__ import annotations
-
-import os
+from config.paths import TABLE_DIR, TEMPLATE_FI_TEX, TEMPLATE_FE_TEX, TEMPLATE_FI_HBRIDGE_TEX
 from dataclasses import dataclass
 from typing import Callable, Dict, Any, Optional, Tuple
 
@@ -25,8 +24,8 @@ class TopologyConfig:
     def compute(self, nominal_data: Dict[str, Any]) -> Tuple[Dict[str, Any], pd.DataFrame, pd.DataFrame]:
         """Run the topology computation with the correct per-topology arguments."""
         kwargs: Dict[str, Any] = {
-            "tex_filename": os.path.join("tex_files", "tables", self.table_tex_filename),
-            "xlsx_filename": os.path.join("tex_files", "tables", self.table_xlsx_filename),
+            "tex_filename": str(TABLE_DIR / self.table_tex_filename),
+            "xlsx_filename": str(TABLE_DIR / self.table_xlsx_filename),
             "export_tex": True,
             "export_xlsx": True,
         }
@@ -45,7 +44,7 @@ def get_topology_configs() -> Dict[str, TopologyConfig]:
             key="yy_internal_fuses",
             label="Dupla estrela com fusíveis internos",
             compute_fn=MasterBankClasses.compute_table07_from_dict,
-            template_tex="tex_files/templates/TEMPLATE__FI.tex",
+            template_tex=TEMPLATE_FI_TEX,
             table_tex_filename="tabela7_real.tex",
             table_xlsx_filename="tabela7_real.xlsx",
             download_xlsx="tabela7_real.xlsx",
@@ -56,7 +55,7 @@ def get_topology_configs() -> Dict[str, TopologyConfig]:
             key="y_internal_fuses",
             label="Estrela simples com fusíveis internos",
             compute_fn=MasterBankClasses.compute_table07_single_from_dict,
-            template_tex="tex_files/templates/TEMPLATE__FI.tex",
+            template_tex=TEMPLATE_FI_TEX,
             table_tex_filename="tabela7y_real.tex",
             table_xlsx_filename="tabela7y_real.xlsx",
             download_xlsx="tabela7y_real.xlsx",
@@ -66,7 +65,7 @@ def get_topology_configs() -> Dict[str, TopologyConfig]:
             key="h_bridge_internal_fuses",
             label="H-Bridge com fusíveis internos",
             compute_fn=MasterBankClasses.compute_table08_from_dict,
-            template_tex="tex_files/templates/TEMPLATE__FI_HBridge.tex",
+            template_tex=TEMPLATE_FI_HBRIDGE_TEX,
             table_tex_filename="tabela8_real.tex",
             table_xlsx_filename="tabela8_real.xlsx",
             download_xlsx="tabela8_real.xlsx",
@@ -76,7 +75,7 @@ def get_topology_configs() -> Dict[str, TopologyConfig]:
             key="yy_external_fuses",
             label="Dupla estrela com fusíveis externos",
             compute_fn=MasterBankClasses.compute_table03_from_dict,
-            template_tex="tex_files/templates/TEMPLATE__FE.tex",
+            template_tex=TEMPLATE_FE_TEX,
             table_tex_filename="tabela3ext_real.tex",
             table_xlsx_filename="tabela3ext_real.xlsx",
             download_xlsx="tabela3ext_real.xlsx",
@@ -86,7 +85,7 @@ def get_topology_configs() -> Dict[str, TopologyConfig]:
             key="h_bridge_external_fuses",
             label="H-Bridge com fusíveis externos",
             compute_fn=MasterBankClasses.compute_table06_from_dict,
-            template_tex="tex_files/templates/TEMPLATE__FE.tex",
+            template_tex=TEMPLATE_FE_TEX,
             table_tex_filename="tabela6_real.tex",
             table_xlsx_filename="tabela6_real.xlsx",
             download_xlsx="tabela6_real.xlsx",

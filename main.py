@@ -1,12 +1,12 @@
 # Comments in English only
 from __future__ import annotations
-
+from pathlib import Path
 import streamlit as st
 
-from latex_report_generator import LatexReportGenerator
+from reports.latex_report_generator import LatexReportGenerator
 from main_part_1 import run_main_part_1
 from topology_registry import get_topology_config
-from utils_streamlit import show_downloads
+from ui.utils_streamlit import show_downloads
 
 
 ctx = run_main_part_1()
@@ -28,8 +28,30 @@ show_downloads(
 )
 
 # ---------------- LaTeX report ----------------
-generator = LatexReportGenerator(template_path=config.template_tex)
-output_file = generator.generate(topologia, dados_nominais_banco)
-
 st.dataframe(df_real)
-generator.compile_pdf(tex_path=output_file)
+
+if "pdf_path" not in st.session_state:
+    st.session_state.pdf_path = None
+
+if st.button("Compilar PDF"):
+    generator = LatexReportGenerator(template_path=config.template_tex)
+    output_file = generator.generate(topologia, dados_nominais_banco)
+    generator.compile_pdf(tex_path=output_file)
+
+    # latexmk gera o PDF com o mesmo nome do .tex
+    pdf_path = Path(output_file).with_suffix(".pdf")
+    st.session_state.pdf_path = pdf_path
+
+    st.success("PDF compilado com sucesso.")
+
+    if st.session_state.pdf_path and st.session_state.pdf_path.exists():
+        with open(st.session_state.pdf_path, "rb") as f:
+            st.download_button(
+                label="Baixar PDF",
+                data=f,
+                file_name=st.session_state.pdf_path.name,
+                mime="application/pdf",
+            )
+
+
+
