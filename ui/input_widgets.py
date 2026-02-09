@@ -21,10 +21,10 @@ def get_dados_nominais_banco(topologia: str):
             label="MVAr de trabalho:",
             min_value=0.1, max_value=100.0, value=15.0
         )
-        Q_rated = 1e-6 * potencia_trifasica_banco_VAr * (V_rated / tensao_trifasica_banco_V) ** 2
+        Q_rated = potencia_trifasica_banco_VAr * (V_rated / tensao_trifasica_banco_V) ** 2
         st.number_input(
             label="MVAr nominal (calculado):",
-            value=float(Q_rated),
+            value=float(1e-6 * Q_rated),
             disabled=True
         )
 

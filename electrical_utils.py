@@ -203,26 +203,40 @@ class ElectricalUtils:
                     add_row(label_si, col_si)
 
         # First row is f
-        rows.append((r"$f$", pd.to_numeric(f_vals, errors="coerce")))
+        rows.append((r"\textit{\textbf{f}}", pd.to_numeric(f_vals, errors="coerce")))
 
         # Cp / Cu blocks
-        add_pair(r"$C_p \, [\mathrm{pu}]$", "Cp", r"$C_p \, [\mu\mathrm{F}]$", "Cp_uF")
-        add_pair(r"$C_u \, [\mathrm{pu}]$", "Cu", r"$C_u \, [\mu\mathrm{F}]$", "C_unit_uF")
+        add_pair(r"\textbf{\textit{C\textsubscript{p}} [pu]}", "Cp",
+                 r"\textbf{\textit{C\textsubscript{p}} [$\mu$F]}", "Cp_uF")
+
+        add_pair(r"\textbf{\textit{C\textsubscript{u}} [pu]}", "Cu",
+                 r"\textbf{\textit{C\textsubscript{u}} [$\mu$F]}", "C_unit_uF")
 
         # Vng / V_phase
-        add_pair(r"$V_{ng} \, [\mathrm{pu}]$", "Vng", r"$V_{ng} \, [\mathrm{V}]$", "V_ng_V")
+        add_pair(r"\textbf{\textit{V\textsubscript{ng}} [pu]}", "Vng",
+                 r"\textbf{\textit{V\textsubscript{ng}} [V]}", "V_ng_V")
 
         # In / Ig (both pu and A)
-        add_pair(r"$I_{n} \, [\mathrm{pu}]$", "In", r"$I_{n} \, [\mathrm{A}]$", "In_A")
-        add_pair(r"$I_{g} \, [\mathrm{pu}]$", "Ig", r"$I_{g} \, [\mathrm{A}]$", "Ig_A")
+        add_pair(r"\textbf{\textit{I\textsubscript{n}} [pu]}", "In",
+                 r"\textbf{\textit{I\textsubscript{n}} [A]}", "In_A")
+
+        add_pair(r"\textbf{\textit{I\textsubscript{g}} [pu]}", "Ig",
+                 r"\textbf{\textit{I\textsubscript{g}} [A]}", "Ig_A")
 
         # Chn / Vhn / Ih / Vcu (pu and real units)
-        add_pair(r"$C_{hn} \, [\mathrm{pu}]$", "Chn", r"$C_{hn} \, [\mu\mathrm{F}]$", "Chn_uF")
-        add_pair(r"$V_{hn} \, [\mathrm{pu}]$", "Vhn", r"$V_{hn} \, [\mathrm{V}]$", "Vhn_V")
-        add_pair(r"$I_{h} \, [\mathrm{pu}]$", "Ih", r"$I_{h} \, [\mathrm{A}]$", "Ih_A")
-        add_pair(r"$V_{cu} \, [\mathrm{pu}]$", "Vcu", r"$V_{cu} \, [\mathrm{kV}]$", "Vcu_kV")
+        add_pair(r"\textbf{\textit{C\textsubscript{hn}} [pu]}", "Chn",
+                 r"\textbf{\textit{C\textsubscript{hn}} [$\mu$F]}", "Chn_uF")
 
-        add_row(r"$V_{cu2} \, [\mathrm{pu2}]$", "Vcu2")
+        add_pair(r"\textbf{\textit{V\textsubscript{hn}} [pu]}", "Vhn",
+                 r"\textbf{\textit{V\textsubscript{hn}} [V]}", "Vhn_V")
+
+        add_pair(r"\textbf{\textit{I\textsubscript{h}} [pu]}", "Ih",
+                 r"\textbf{\textit{I\textsubscript{h}} [A]}", "Ih_A")
+
+        add_pair(r"\textbf{\textit{V\textsubscript{cu}} [pu]}", "Vcu",
+                 r"\textbf{\textit{V\textsubscript{cu}} [kV]}", "Vcu_kV")
+
+        add_row(r"\textbf{\textit{V\textsubscript{cu2}} [pu2]}", "Vcu2")
 
         # --- formatter for numbers ---
         def _fmt_cell(v, is_f_row: bool, decimals_: int):
@@ -244,7 +258,7 @@ class ElectricalUtils:
         # Build table as list-of-lists of strings: first col is label
         table_rows = []
         for label, values in rows:
-            is_f_row = (label == r"$f$")
+            is_f_row = (label == r"\textit{\textbf{f}}")
             row = [label] + [_fmt_cell(v, is_f_row=is_f_row, decimals_=decimals) for v in values]
             table_rows.append(row)
 

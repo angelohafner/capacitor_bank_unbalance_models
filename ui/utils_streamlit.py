@@ -99,7 +99,7 @@ def show_topology_figure(dados_nominais_banco):
 
         fig = h.make_figure(title="H-Bridge", width=1600, height=450)
         st.plotly_chart(fig, use_container_width=True)
-        return
+        return fig
 
     st.warning(f"No figure defined for topology '{topologia}'")
 def _serialize_to_json_bytes(obj) -> bytes:

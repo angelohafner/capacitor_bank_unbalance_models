@@ -93,7 +93,7 @@ def run_main_part_1():
         st.stop()
 
     # ---------------- Show topology figure / exports ----------------
-    show_topology_figure(dados_nominais_banco)
+    fig = show_topology_figure(dados_nominais_banco)
     ensure_export_dir()
     LatexReportGenerator.export_dict_tabular(
         data=dados_nominais_banco,

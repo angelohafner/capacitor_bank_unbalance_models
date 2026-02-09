@@ -114,16 +114,19 @@ class LatexReportGenerator:
         #################################################
         # Mapeamento de keys: antiga -> nova
         key_map = {
-            "tensao_trifasica_banco_V": r"$V_{trabalho}\,\mathrm{(V)}$",
-            "potencia_trifasica_banco_VAr": r"$Q_{trabalho}\,\mathrm{(VAr)}$",
-            "V_rated": r"$V_{nominal}\,\mathrm{(V)}$",
-            "Q_rated": r"$Q_{nominal}\,\mathrm{(VAr)}$",
-            "frequencia_Hz": r"$f\,\mathrm{(Hz)}$",
-            "S": r"S",
-            "St": r"St",
-            "Pt": r"Pt",
-            "Pa": r"Pa",
-            "G": r"G",
+            "tensao_trifasica_banco_V": r"Tensão de Trabalho (V)",
+            "potencia_trifasica_banco_VAr": r"Potência de Trabalho (VAr)",
+            "V_rated": r"Tensão Nominal (V)",
+            "Q_rated": r"Potência Nominal (VAr)",
+            "frequencia_Hz": r"Frequência (Hz)",
+            "S": r"Unidades Séries Fase-Neutro",
+            "St": r"Unidades Séries Fase-Neutro",
+            "Pt": r"Unidades Paralelas Total",
+            "Pa": r"Unidades Paralelas Ramo Esquerd",
+            "P": r"Unidades Paralelas String Afetada",
+            "N": r"Elementos internos em paralelo no grupo",
+            "Su": r"Grupos de elmentos em série em uma unidade",
+            "G": r"Aterrado (0) / Isolado (1)",
             "topologia_protecao": "Topologia de Protecao",
         }
 
@@ -140,7 +143,7 @@ class LatexReportGenerator:
 
         lines: list[str] = []
         lines.append(r"\centering")
-        lines.append(r"\begin{tabular}{ll}")
+        lines.append(r"\begin{tabular}{lr}")
         lines.append(r"\hline")
         lines.append(r"\textbf{Variável} & \textbf{Valor} \\")
         lines.append(r"\hline")
