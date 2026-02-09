@@ -1,0 +1,172 @@
+\documentclass[12pt,a4paper]{article}
+
+% =========================
+% Pacotes
+% =========================
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+
+\usepackage{amsmath,amssymb}
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{caption}
+
+% ====== COLE NO PREAMBULO (antes de \begin{document}) ======
+	\usepackage{float}      % habilita o [H]
+	\usepackage{placeins}   % habilita \FloatBarrier (opcional)
+	
+	% (opcional) melhora o posicionamento de floats
+	\setcounter{topnumber}{5}
+	\setcounter{bottomnumber}{5}
+	\setcounter{totalnumber}{10}
+	\renewcommand{\topfraction}{0.95}
+	\renewcommand{\bottomfraction}{0.95}
+	\renewcommand{\textfraction}{0.05}
+	\renewcommand{\floatpagefraction}{0.9}
+
+
+% =========================
+% Configurações
+% =========================
+\geometry{
+	left=25mm,
+	right=25mm,
+	top=25mm,
+	bottom=25mm
+}
+
+\sisetup{
+	output-decimal-marker = {,},
+	per-mode = symbol
+}
+
+\setstretch{1.2}
+
+% =========================
+% Documento
+% =========================
+\begin{document}
+	
+	\section*{Proteção de Desbalanço de Banco de Capacitores}
+	
+	\textbf{Configuração do banco:} Dupla estrela isolada \\
+	\textbf{Medição:} TC no elo dos neutros \\
+	\textbf{Corrente nominal do canal:} $I_n = \SI{1}{\ampere}$
+	
+	% ======================================================
+	\section{Implementação no REX615}
+	
+	\textbf{IED:} REX615 \\
+	\textbf{Função:} CUBPTOC -- \textit{Current Unbalance Protection} (ANSI 60N)
+	
+	\subsection*{Parâmetros gerais}
+	
+	\begin{table}[H]
+		\centering
+		\caption{Parâmetros gerais da função CUBPTOC -- REX615}
+		\begin{tabular}{>{\raggedright}p{5cm} c c p{5cm}}
+			\toprule
+			\textbf{Parâmetro} & \textbf{Valor} & \textbf{Unidade} & \textbf{Observação} \\
+			\midrule
+			Operation & On & -- & Função habilitada \\
+			Measurement mode & RMS & -- & Medição em valor eficaz \\
+			Natural unbalance compensation & On & -- & Compensação do desbalanço natural do banco \\
+			Record natural unbalance & Executar & -- & Banco energizado e em condição saudável \\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+	
+	\subsection*{Estágio de Alarme}
+	
+	\begin{table}[H]
+		\centering
+		\caption{Ajustes do estágio de alarme -- REX615}
+		\begin{tabular}{>{\raggedright}p{5cm} c c p{5cm}}
+			\toprule
+			\textbf{Parâmetro} & \textbf{Valor} & \textbf{Unidade} & \textbf{Observação} \\
+			\midrule
+			Alarm start value & 0{,}18 & pu & $0{,}18\ \si{\ampere}$ (sec) \\
+			Alarm delay time & 1{,}00 & s & Tempo definido \\
+			Alarm output & Alarm & -- & LED e supervisão (SCADA) \\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+	
+	\subsection*{Estágio de Trip}
+	
+	\begin{table}[H]
+		\centering
+		\caption{Ajustes do estágio de trip -- REX615}
+		\begin{tabular}{>{\raggedright}p{5cm} c c p{5cm}}
+			\toprule
+			\textbf{Parâmetro} & \textbf{Valor} & \textbf{Unidade} & \textbf{Observação} \\
+			\midrule
+			Start value & 0{,}45 & pu & $0{,}45\ \si{\ampere}$ (sec) \\
+			Operate delay time & 0{,}50 & s & Tempo definido \\
+			Operate output & Trip (94/86) & -- & Desligamento do banco \\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+	
+	% ======================================================
+	\section{Implementação no REF630}
+	
+	\textbf{IED:} REF630 \\
+	\textbf{Função utilizada:} EFxPTOC -- Sobrecorrente residual (ANSI 51N) \\
+	\textbf{Observação:} Uso adaptado da proteção de falta à terra para detectar corrente no elo dos neutros
+	
+	\subsection*{Estágio de Alarme (EFLPTOC -- I\textsubscript{0}>)}
+	
+	\begin{table}[H]
+		\centering
+		\caption{Ajustes do estágio de alarme -- REF630}
+		\begin{tabular}{>{\raggedright}p{5cm} c c p{5cm}}
+			\toprule
+			\textbf{Parâmetro} & \textbf{Valor} & \textbf{Unidade} & \textbf{Observação} \\
+			\midrule
+			Start value & 0{,}18 & pu & $0{,}18\ \si{\ampere}$ (sec) \\
+			Operate delay time & 1{,}00 & s & Tempo definido \\
+			Output & Alarm & -- & Indicação local e SCADA \\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+	
+	\subsection*{Estágio de Trip (EFHPTOC -- I\textsubscript{0}>>)}
+	
+	\begin{table}[H]
+		\centering
+		\caption{Ajustes do estágio de trip -- REF630}
+		\begin{tabular}{>{\raggedright}p{5cm} c c p{5cm}}
+			\toprule
+			\textbf{Parâmetro} & \textbf{Valor} & \textbf{Unidade} & \textbf{Observação} \\
+			\midrule
+			Start value & 0{,}45 & pu & $0{,}45\ \si{\ampere}$ (sec) \\
+			Operate delay time & 0{,}50 & s & Tempo definido \\
+			Output & Trip (94/86) & -- & Desligamento do banco \\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+	
+	% ======================================================
+	\section{Comparação entre REX615 e REF630}
+	
+	\subsection*{Diferenças funcionais}
+	
+	\begin{itemize}
+		\item O REX615 possui a função \textbf{CUBPTOC (ANSI 60N)}, dedicada à proteção de desbalanço de bancos de capacitores, projetada especificamente para configurações em dupla estrela isolada.
+		\item O REF630 não dispõe de função dedicada para desbalanço de banco de capacitores, sendo necessária a utilização adaptada da proteção de sobrecorrente residual \textbf{EFxPTOC (ANSI 51N)}.
+		\item No REX615, os estágios de \textbf{alarme} e \textbf{trip} são nativos da função, enquanto no REF630 estes estágios dependem de lógica de aplicação e amarração externa.
+		\item O REX615 oferece compensação automática do desbalanço natural do banco (\textit{natural unbalance compensation}), recurso inexistente no REF630.
+	\end{itemize}
+	
+	\subsection*{Adequação técnica}
+	
+	O REX615 é mais adequado para a proteção de desbalanço de bancos de capacitores em dupla estrela isolada, pois sua função CUBPTOC foi desenvolvida especificamente para detectar falhas internas de elementos capacitivos, como queima de fusíveis ou variações de capacitância, garantindo maior seletividade e confiabilidade.
+	
+	O REF630 pode ser utilizado apenas como solução alternativa, quando não há IED específico para banco de capacitores disponível, porém trata-se de uma adaptação de uma função de falta à terra, não sendo a solução preferencial do ponto de vista de engenharia de proteção.
+	
+\end{document}

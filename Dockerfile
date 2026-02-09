@@ -30,7 +30,9 @@ COPY . .
 RUN mkdir -p /app/tex_files/figs \
              /app/tex_files/reports \
              /app/tex_files/tables \
-             /app/tex_files/templates
+             /app/tex_files/templates \
+             /app/tex_files/reports/figs \
+            /app/tex_files/reports/tables
 
 # Expose Streamlit port
 EXPOSE 8080
