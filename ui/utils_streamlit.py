@@ -30,7 +30,7 @@ def show_topology_figure(dados_nominais_banco):
         # Half-size (only for this topology)
         fig = diagram.make_figure(width=450, height=350)
         st.plotly_chart(fig, use_container_width=False)
-        fig.write_image(r"./tex_files/reports/figs/figura-banco-real.pdf")
+        #fig.write_image(r"./tex_files/reports/figs/figura-banco-real.pdf")
 
         return
 
@@ -49,7 +49,7 @@ def show_topology_figure(dados_nominais_banco):
         diagram = BankDiagram(P=P, S=S, Pt=Pt, Pa_left=Pa)
         fig = diagram.make_figure()
         st.plotly_chart(fig, use_container_width=True)
-        fig.write_image(r"./tex_files/reports/figs/figura-banco-real.pdf")
+        # fig.write_image(r"./tex_files/reports/figs/figura-banco-real.pdf")
         return
 
     if topologia == "yy_external_fuses":
@@ -69,7 +69,7 @@ def show_topology_figure(dados_nominais_banco):
         fig = diagram.make_figure()
         st.plotly_chart(fig, use_container_width=True)
 
-        fig.write_image(r"./tex_files/reports/figs/figura-banco-real.pdf")
+        # fig.write_image(r"./tex_files/reports/figs/figura-banco-real.png")
 
         return
 
@@ -103,7 +103,7 @@ def show_topology_figure(dados_nominais_banco):
 
         fig = h.make_figure(title="H-Bridge", width=1600, height=450)
         st.plotly_chart(fig, use_container_width=True)
-        fig.write_image(r"./tex_files/reports/figs/figura-banco-real.pdf")
+        # fig.write_image(r"./tex_files/reports/figs/figura-banco-real.pdf")
         return
 
 
