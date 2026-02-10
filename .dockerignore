@@ -1,0 +1,16 @@
+.git
+.idea
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+
+tex_files/reports/*.aux
+tex_files/reports/*.bbl
+tex_files/reports/*.bcf
+tex_files/reports/*.blg
+tex_files/reports/*.fdb_latexmk
+tex_files/reports/*.fls
+tex_files/reports/*.out
+tex_files/reports/*.run.xml
+tex_files/reports/*.pdf
