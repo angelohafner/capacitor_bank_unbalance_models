@@ -122,7 +122,7 @@ class LatexReportGenerator:
             "S": r"Unidades Séries Fase-Neutro",
             "St": r"Unidades Séries Fase-Neutro",
             "Pt": r"Unidades Paralelas Total",
-            "Pa": r"Unidades Paralelas Ramo Esquerd",
+            "Pa": r"Unidades Paralelas Ramo Esquerda",
             "P": r"Unidades Paralelas String Afetada",
             "N": r"Elementos internos em paralelo no grupo",
             "Su": r"Grupos de elmentos em série em uma unidade",
