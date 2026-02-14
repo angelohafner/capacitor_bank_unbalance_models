@@ -1,15 +1,15 @@
-[0] Config.pm:308> INFO - This is Biber 2.20
-[3] Config.pm:311> INFO - Logfile is 'report__yy_internal_fuses.blg'
-[264] biber-MSWIN64:340> INFO - === 
-[359] Biber.pm:420> INFO - Reading 'report__yy_internal_fuses.bcf'
-[466] Biber.pm:994> INFO - Found 2 citekeys in bib section 0
-[482] Biber.pm:4463> INFO - Processing section 0
-[518] Biber.pm:4654> INFO - Looking for bibtex file 'bibliografia.bib' for section 0
-[575] bibtex.pm:1713> INFO - LaTeX decoding ...
-[589] bibtex.pm:1519> INFO - Found BibTeX data source 'bibliografia.bib'
-[676] UCollate.pm:68> INFO - Overriding locale 'pt-PT' defaults 'normalization = NFD' with 'normalization = prenormalized'
-[676] UCollate.pm:68> INFO - Overriding locale 'pt-PT' defaults 'variable = shifted' with 'variable = non-ignorable'
-[676] Biber.pm:4283> INFO - Sorting list 'none/global//global/global/global' of type 'entry' with template 'none' and locale 'pt-PT'
-[676] Biber.pm:4289> INFO - No sort tailoring available for locale 'pt-PT'
-[678] bbl.pm:676> INFO - Writing 'report__yy_internal_fuses.bbl' with encoding 'UTF-8'
-[680] bbl.pm:779> INFO - Output to report__yy_internal_fuses.bbl
+[0] Config.pm:307> INFO - This is Biber 2.19
+[0] Config.pm:310> INFO - Logfile is 'report__yy_internal_fuses.blg'
+[73] biber:340> INFO - === sex fev 13, 2026, 19:36:31
+[88] Biber.pm:419> INFO - Reading 'report__yy_internal_fuses.bcf'
+[151] Biber.pm:979> INFO - Found 2 citekeys in bib section 0
+[165] Biber.pm:4419> INFO - Processing section 0
+[176] Biber.pm:4610> INFO - Looking for bibtex file 'bibliografia.bib' for section 0
+[176] bibtex.pm:1713> INFO - LaTeX decoding ...
+[179] bibtex.pm:1519> INFO - Found BibTeX data source 'bibliografia.bib'
+[215] UCollate.pm:68> INFO - Overriding locale 'pt-PT' defaults 'variable = shifted' with 'variable = non-ignorable'
+[215] UCollate.pm:68> INFO - Overriding locale 'pt-PT' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[215] Biber.pm:4239> INFO - Sorting list 'none/global//global/global' of type 'entry' with template 'none' and locale 'pt-PT'
+[215] Biber.pm:4245> INFO - No sort tailoring available for locale 'pt-PT'
+[216] bbl.pm:660> INFO - Writing 'report__yy_internal_fuses.bbl' with encoding 'UTF-8'
+[217] bbl.pm:763> INFO - Output to report__yy_internal_fuses.bbl

@@ -1,5 +1,5 @@
 % $ biblatex auxiliary file $
-% $ biblatex bbl format version 3.3 $
+% $ biblatex bbl format version 3.2 $
 % Do not modify the above lines!
 %
 % This is an auxiliary file used by the 'biblatex' package.
@@ -18,8 +18,8 @@
 
 
 \refsection{0}
-  \datalist[entry]{none/global//global/global/global}
-    \entry{ieeec3799}{standard}{}{}
+  \datalist[entry]{none/global//global/global}
+    \entry{ieeec3799}{standard}{}
       \list{location}{1}{%
         {New York, USA}%
       }
@@ -33,7 +33,7 @@
       \field{title}{IEEE Guide for the Protection of Shunt Capacitor Banks}
       \field{year}{2012}
     \endentry
-    \entry{ieee18}{standard}{}{}
+    \entry{ieee18}{standard}{}
       \list{location}{1}{%
         {New York, USA}%
       }
