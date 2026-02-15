@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (MiKTeX 24.4) (preloaded format=pdflatex 2025.5.4)  10 FEB 2026 10:17
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (MiKTeX 24.4) (preloaded format=pdflatex 2025.5.4)  15 FEB 2026 16:43
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -890,15 +890,16 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 gel/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}
 
  <./figs/logo.png> <./figs/Figure34-yy_internal_fuses.png>]
-
-LaTeX Warning: Reference `fig:figura-banco-real' on page 2 undefined on input l
-ine 116.
-
-(tables/tabela_dados_nominais.tex)
+<./figs/figura-banco-real.pdf, id=53, 527.08919pt x 376.52669pt>
+File: ./figs/figura-banco-real.pdf Graphic file (type pdf)
+<use ./figs/figura-banco-real.pdf>
+Package pdftex.def Info: ./figs/figura-banco-real.pdf  used on input line 120.
+(pdftex.def)             Requested size: 435.32422pt x 310.9888pt.
+ (tables/tabela_dados_nominais.tex)
 
 File: ./figs/logo.png Graphic file (type png)
 <use ./figs/logo.png>
-Package pdftex.def Info: ./figs/logo.png  used on input line 139.
+Package pdftex.def Info: ./figs/logo.png  used on input line 142.
 (pdftex.def)             Requested size: 84.78998pt x 35.5666pt.
 
 Overfull \hbox (9.14719pt too wide) has occurred while \output is active
@@ -913,11 +914,11 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 
 (fancyhdr)                \addtolength{\topmargin}{-58.70549pt}.
 
-[2]
+[2 <./figs/figura-banco-real.pdf>]
 LaTeX Font Info:    Font shape `OT1/phv/m/it' in size <10> not available
-(Font)              Font shape `OT1/phv/m/sl' tried instead on input line 141.
+(Font)              Font shape `OT1/phv/m/sl' tried instead on input line 149.
  (tables/tabela7_real.tex)
-Overfull \hbox (97.44739pt too wide) in paragraph at lines 1--150
+Overfull \hbox (97.44739pt too wide) in paragraph at lines 1--158
  [][] 
  []
 
@@ -942,23 +943,14 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 
 [3]
 LaTeX Font Info:    Trying to load font information for TS1+phv on input line 1
-73.
+81.
  (C:\Users\angel\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ts1phv.fd
 File: ts1phv.fd 2020/03/25 scalable font definitions for TS1/phv.
 )
 
-Package biblatex Warning: No driver for 'standard'.
-(biblatex)                Using fallback driver on input line 191.
-
-
-Package biblatex Warning: No driver for 'standard'.
-(biblatex)                Using fallback driver on input line 191.
-
-
-
 File: ./figs/logo.png Graphic file (type png)
 <use ./figs/logo.png>
-Package pdftex.def Info: ./figs/logo.png  used on input line 244.
+Package pdftex.def Info: ./figs/logo.png  used on input line 192.
 (pdftex.def)             Requested size: 84.78998pt x 35.5666pt.
 
 Overfull \hbox (9.14719pt too wide) has occurred while \output is active
@@ -973,17 +965,41 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 
 (fancyhdr)                \addtolength{\topmargin}{-58.70549pt}.
 
-[4] 
+[4]
+
+Package biblatex Warning: No driver for 'standard'.
+(biblatex)                Using fallback driver on input line 199.
+
+
+Package biblatex Warning: No driver for 'standard'.
+(biblatex)                Using fallback driver on input line 199.
+
+
+
+File: ./figs/logo.png Graphic file (type png)
+<use ./figs/logo.png>
+Package pdftex.def Info: ./figs/logo.png  used on input line 252.
+(pdftex.def)             Requested size: 84.78998pt x 35.5666pt.
+
+Overfull \hbox (9.14719pt too wide) has occurred while \output is active
+ [][] 
+ []
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 70.70549pt, for example:
+(fancyhdr)                \setlength{\headheight}{70.70549pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-58.70549pt}.
+
+[5] 
 enddocument/afterlastpage: lastpage setting LastPage.
 (TEMPLATE__FI.aux)
  ***********
 LaTeX2e <2024-06-01> patch level 2
 L3 programming layer <2024-08-30>
  ***********
-
-
-LaTeX Warning: There were undefined references.
-
 Package rerunfilecheck Info: File `TEMPLATE__FI.out' has not changed.
 (rerunfilecheck)             Checksum: 92B785284E7CF4978D398174BAE69BFB;1088.
 Package logreq Info: Writing requests to 'TEMPLATE__FI.run.xml'.
@@ -991,13 +1007,13 @@ Package logreq Info: Writing requests to 'TEMPLATE__FI.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 23062 strings out of 473861
- 420617 string characters out of 5724800
- 1275613 words of memory out of 5000000
- 45638 multiletter control sequences out of 15000+600000
+ 23073 strings out of 473861
+ 420959 string characters out of 5724800
+ 1272664 words of memory out of 5000000
+ 45647 multiletter control sequences out of 15000+600000
  571119 words of font info for 58 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,24n,81p,809b,1638s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,24n,81p,805b,1638s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/angel/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
 cmmi10.pfb><C:/Users/angel/AppData/Local/Programs/MiKTeX/fonts/type1/public/ams
 fonts/cm/cmmi5.pfb><C:/Users/angel/AppData/Local/Programs/MiKTeX/fonts/type1/pu
@@ -1008,9 +1024,9 @@ s/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/angel/AppData/Loca
 l/Programs/MiKTeX/fonts/type1/public/urw-base35/uhvb8a.pfb><C:/Users/angel/AppD
 ata/Local/Programs/MiKTeX/fonts/type1/public/urw-base35/uhvr8a.pfb><C:/Users/an
 gel/AppData/Local/Programs/MiKTeX/fonts/type1/public/urw-base35/uhvro8a.pfb>
-Output written on TEMPLATE__FI.pdf (4 pages, 222397 bytes).
+Output written on TEMPLATE__FI.pdf (5 pages, 235577 bytes).
 PDF statistics:
- 134 PDF objects out of 1000 (max. 8388607)
- 20 named destinations out of 1000 (max. 500000)
- 67 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 153 PDF objects out of 1000 (max. 8388607)
+ 22 named destinations out of 1000 (max. 500000)
+ 72 words of extra memory for PDF output out of 10000 (max. 10000000)
 

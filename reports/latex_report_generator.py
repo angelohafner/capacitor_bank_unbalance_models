@@ -219,10 +219,17 @@ class LatexReportGenerator:
 
         return content
 
-    def save_report(self, content: str, topology: str) -> str:
+    def save_report(self, content: str, topology: str, data: Dict[str, Any]) -> str:
         REPORT_DIR.mkdir(parents=True, exist_ok=True)
 
-        output_path = REPORT_DIR / f"report__{topology}.tex"
+        output_path = REPORT_DIR / (
+            f"{topology}_"
+            f"{int(data['tensao_trifasica_banco_V']/1e3)}-{int(data['V_rated']/1e3)}kV_"
+            f"{int(data['potencia_trifasica_banco_VAr']/1e6)}-"
+            f"{int(data['Q_rated']/1e6)}MVAr_"
+            f"{data['S']}S-"
+            f"{data['Pt']}P.tex"
+        )
         output_path.write_text(content, encoding="utf-8")
         return str(output_path)
 
@@ -233,7 +240,7 @@ class LatexReportGenerator:
 
         content = self.load_template()
         content = self.fill_template(content, topology, data)
-        output_path = self.save_report(content, topology)
+        output_path = self.save_report(content, topology, data)
         return output_path
 
     def compile_pdf(self, *, tex_path: str | Path) -> str:
