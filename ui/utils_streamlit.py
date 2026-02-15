@@ -2,7 +2,7 @@
 # Comments in English only
 import os
 from pathlib import Path
-from config.paths import TABLE_DIR, ATP_DIR, ensure_directories
+from config.paths import TABLE_DIR, ATP_DIR, FIG_DIR, ensure_directories
 import json
 import io
 import streamlit as st
@@ -10,6 +10,7 @@ import pandas as pd
 import zipfile
 from diagrams.bank_diagram import BankDiagram, SingleWyeBankDiagram
 from diagrams.h_bridge_drawing import HCompleteWithNeutralCT
+from diagrams.bank_diagram_mpl import BankDiagramMPL
 from validation.validators import validate_inputs
 from diagrams.y_internal_fuses_diagram import ThreePhaseYInternalFusesDiagram
 
@@ -28,9 +29,9 @@ def show_topology_figure(dados_nominais_banco):
         S = int(dados_nominais_banco.get("S", 4))
         diagram = ThreePhaseYInternalFusesDiagram(S=S)
         # Half-size (only for this topology)
-        fig = diagram.make_figure(width=450, height=350)
-        st.plotly_chart(fig, use_container_width=False)
-        #fig.write_image(r"./tex_files/reports/figs/figura-banco-real.pdf")
+        fig_plotly = diagram.make_figure(width=450, height=350)
+        st.plotly_chart(fig_plotly, width='stretch')
+
 
         return
 
@@ -47,9 +48,13 @@ def show_topology_figure(dados_nominais_banco):
             return
 
         diagram = BankDiagram(P=P, S=S, Pt=Pt, Pa_left=Pa)
-        fig = diagram.make_figure()
-        st.plotly_chart(fig, use_container_width=True)
-        # fig.write_image(r"./tex_files/reports/figs/figura-banco-real.pdf")
+        fig_plotly = diagram.make_figure()
+        st.plotly_chart(fig_plotly, width='stretch')
+        from ui.plotly_to_mpl import plotly_figure_to_matplotlib
+        fig_mpl, ax = plotly_figure_to_matplotlib(fig_plotly, figsize=(8, 8))
+        fig_mpl.savefig("bank_diagram_matplotlib.pdf", format="pdf", bbox_inches='tight', pad_inches=0)  # ou .png dpi=300
+        fig_mpl.savefig(FIG_DIR / "bank_diagram_matplotlib.pdf", bbox_inches="tight")
+
         return
 
     if topologia == "yy_external_fuses":
@@ -66,10 +71,8 @@ def show_topology_figure(dados_nominais_banco):
             return
 
         diagram = BankDiagram(P=P, S=S, Pt=Pt, Pa_left=Pa)
-        fig = diagram.make_figure()
-        st.plotly_chart(fig, use_container_width=True)
-
-        # fig.write_image(r"./tex_files/reports/figs/figura-banco-real.png")
+        fig_plotly = diagram.make_figure()
+        st.plotly_chart(fig_plotly, width='stretch')
 
         return
 
@@ -101,9 +104,9 @@ def show_topology_figure(dados_nominais_banco):
             ct_box_h=1.4,
         )
 
-        fig = h.make_figure(title="H-Bridge", width=1600, height=450)
-        st.plotly_chart(fig, use_container_width=True)
-        # fig.write_image(r"./tex_files/reports/figs/figura-banco-real.pdf")
+        fig_plotly = h.make_figure(title="H-Bridge", width=1600, height=450)
+        st.plotly_chart(fig_plotly, width='stretch')
+
         return
 
 
