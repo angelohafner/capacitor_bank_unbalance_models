@@ -1,0 +1,13 @@
+pip freeze > requirements.txt
+
+gcloud builds submit --tag gcr.io/apps-dax-energy/st-banco-de-capacitores-desbalanceamento-ieee-c37-99  --project=apps-dax-energy 
+
+gcloud run deploy --image gcr.io/apps-dax-energy/st-banco-de-capacitores-desbalanceamento-ieee-c37-99 --platform managed  --project=apps-dax-energy --allow-unauthenticated
+
+
+
+gcloud builds submit --tag gcr.io/apps-dax-energy/st-banco-de-capacitores-desbalanceamento-ieee-c37-99 --project=apps-dax-energy && gcloud run deploy st-banco-de-capacitores-desbalanceamento-ieee-c37-99 --image gcr.io/apps-dax-energy/st-banco-de-capacitores-desbalanceamento-ieee-c37-99 --platform managed --project=apps-dax-energy --region southamerica-east1 --allow-unauthenticated
+
+
+
+
