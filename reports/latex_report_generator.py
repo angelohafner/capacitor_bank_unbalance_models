@@ -11,7 +11,7 @@ from pathlib import Path
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from config.paths import REPORT_DIR, TABLE_DIR, TEMPLATE_DIR, TEMPLATE_FI_TEX, TEMPLATE_FE_TEX
+from config.paths import REPORT_DIR, TABLE_DIR, TEMPLATE_DIR, TEMPLATE_FI_TEX, TEMPLATE_FE_TEX, TEMPLATE_FI_HBRIDGE_TEX
 #from engineering_notation import EngNumber
 
 
@@ -208,10 +208,14 @@ class LatexReportGenerator:
     def _template_from_topology(self, topology: str) -> Path:
         topology_str = str(topology).strip()
 
-        if topology_str.endswith("_external_fuses"):
+        # Specific template for H-Bridge internal fuses
+        if topology_str == "h_bridge_internal_fuses":
+            return TEMPLATE_FI_HBRIDGE_TEX
+
+        if topology_str in ("yy_external_fuses", "y_external_fuses"):
             return TEMPLATE_FE_TEX
 
-        if topology_str.endswith("_internal_fuses"):
+        if topology_str in ("yy_internal_fuses", "y_internal_fuses"):
             return TEMPLATE_FI_TEX
 
         return TEMPLATE_DIR / f"TEMPLATE__{topology_str}.tex"

@@ -61,17 +61,14 @@
 % SECTION STYLE
 % ======================================================
 \usepackage{titlesec}
-
 \titleformat{\section}
-{\normalfont\large\bfseries}
-{\thesection}{1em}{}
+{\normalfont\large\bfseries}{\thesection}{1em}{}
 
 % ======================================================
 % HEADER / FOOTER
 % ======================================================
 \pagestyle{fancy}
 \fancyhf{}
-
 \renewcommand{\headrulewidth}{0pt}
 \renewcommand{\footrulewidth}{0.4pt}
 
@@ -88,7 +85,7 @@
 			\hyphenpenalty=10000
 			\vspace*{\fill}
 			\begin{spacing}{1.5}
-				{\large \textbf{Proteção de Banco de Capacitores}}
+				{\large \textbf{Proteção de Banco de\\ Capacitores em Ponte H}}
 			\end{spacing}
 			\vspace*{\fill}
 		\end{minipage}
@@ -108,36 +105,26 @@
 \fancyfoot[R]{+55 41 99281-3744}
 
 % ======================================================
-% DOCUMENT
-% ======================================================
 \begin{document}
-	
 	\setstretch{1.25}
 	
 	% ======================================================
 	\section{Contexto}
 	% ======================================================
 	
-	Em sistemas elétricos de potência, especialmente em bancos de capacitores de média tensão, pequenos níveis de desequilíbrio fazem parte do regime normal de operação. Esses desvios são decorrentes de tolerâncias construtivas, variações naturais das tensões do sistema e diferenças operacionais entre fases.
+	Bancos de capacitores conectados em ponte H com fusíveis externos são empregados em sistemas de média e alta tensão quando se busca elevada confiabilidade operacional associada à facilidade de manutenção e substituição de unidades capacitivas.
 	
-	Quando mantidos dentro de limites admissíveis, tais desequilíbrios não comprometem o desempenho nem a segurança do banco. Entretanto, a evolução progressiva dessas grandezas pode indicar degradação interna das unidades capacitivas, tornando necessário o monitoramento contínuo.
+	Devido às tolerâncias construtivas, variações de tensão do sistema e diferenças naturais entre unidades capacitivas, pequenos desequilíbrios elétricos são esperados durante a operação normal. Nessas condições, a corrente diferencial da ponte permanece reduzida, caracterizando regime equilibrado.
+	
+	A ocorrência de falhas em unidades capacitivas ou em seus fusíveis externos altera o balanço elétrico entre os ramos da ponte H, produzindo corrente diferencial mensurável. Essa variação constitui o princípio fundamental de detecção de anormalidades nesse tipo de banco.
 	
 	\begin{figure}[htbp]
 		\centering
-		\includegraphics[width=0.9\linewidth]{./figs/Figure29-yy_external_fuses}
-		\caption{Banco de capacitores em dupla estrela assimétrica \cite{ieeec3799}.}
+		\includegraphics[width=0.6\linewidth]{./figs/Figure32-h_bridge_external_fuses}
+		\caption{Configuração típica de banco de capacitores em ponte H com fusíveis externos.}
 	\end{figure}
 	
-	Em conexões estrela isolada, o neutro não é diretamente aterrado. Nessas condições, a tensão de deslocamento \(V_{OG}\) e a corrente de neutro \(I_n\) apresentam valores reduzidos, idealmente próximos de zero. A perda parcial de elementos capacitivos provoca aumento dessas grandezas, permitindo a identificação de condições anormais.
-	
-	O monitoramento pode ser realizado por:
-	
-	\begin{itemize}
-		\item Transformador de Potencial (TP) para medição da tensão de deslocamento;
-		\item Transformador de Corrente (TC) para medição da corrente de desequilíbrio.
-	\end{itemize}
-	
-	O relé associado ao disjuntor integra-se ao sistema supervisório, possibilitando diagnóstico remoto e atuação automática.
+	Na condição ideal de operação, os ramos opostos da ponte apresentam impedâncias equivalentes, resultando em diferença de potencial praticamente nula entre os pontos médios e, consequentemente, corrente diferencial próxima de zero.
 	
 	% ======================================================
 	\section{Banco em Estudo}
@@ -145,19 +132,23 @@
 	
 	\begin{figure}[htbp]
 		\centering
-		\includegraphics[height=8cm]{./figs/bank_diagram_matplotlib}
-		\caption{Diagrama elétrico do banco de capacitores analisado.}
-		\label{fig:bank_diagram_matplotlib}
+		\includegraphics[height=8cm,width=16cm]{./figs/bank_diagram_matplotlib}
+		\caption{Diagrama elétrico do banco de capacitores em ponte H analisado.}
+		\label{fig:h_bridge_bank}
 	\end{figure}
 	
-	O banco analisado possui configuração em dupla estrela com fusíveis internos, conforme ilustrado na Fig.~\ref{fig:bank_diagram_matplotlib}. Essa topologia proporciona:
+	O banco analisado utiliza configuração em ponte H composta por unidades capacitivas protegidas por fusíveis externos, conforme ilustrado na Fig.~\ref{fig:h_bridge_bank}.
+	
+	Essa topologia apresenta as seguintes características:
 	
 	\begin{itemize}
-		\item distribuição mais uniforme das tensões internas;
-		\item maior continuidade operacional;
-		\item elevada tolerância a falhas individuais;
-		\item desconexão automática de unidades defeituosas.
+		\item elevada sensibilidade à perda de unidades capacitivas;
+		\item facilidade de manutenção e substituição de equipamentos;
+		\item redução do impacto térmico sobre as unidades capacitivas;
+		\item elevada robustez operacional.
 	\end{itemize}
+	
+	Os fusíveis externos são instalados em série com cada unidade capacitiva e têm como função isolar rapidamente o capacitor defeituoso em caso de falha, evitando a propagação de danos ao restante do banco.
 	
 	\begin{table}[htbp]
 		\centering
@@ -167,68 +158,78 @@
 	\end{table}
 	
 	% ======================================================
+	\section{Princípio de Detecção de Desequilíbrio}
+	% ======================================================
+	
+	Na configuração em ponte H com fusíveis externos, a proteção baseia-se na medição da corrente diferencial entre os ramos da ponte.
+	
+	Em condição equilibrada:
+	
+	\[
+	I_{\text{diff}} \approx 0
+	\]
+	
+	A atuação de um fusível externo ou a perda de uma unidade capacitiva provoca alteração da impedância do ramo correspondente, resultando em corrente diferencial proporcional ao grau de desequilíbrio.
+	
+	A medição é normalmente realizada por:
+	
+	\begin{itemize}
+		\item Transformador de Corrente diferencial instalado no elo central da ponte;
+		\item Funções dedicadas de proteção de desequilíbrio em relés digitais.
+	\end{itemize}
+	
+	Esse método permite detectar tanto falhas internas quanto operações de fusíveis externos, garantindo rápida identificação de condições anormais.
+	
+	% ======================================================
 	\section{Níveis de Supervisão}
 	% ======================================================
 	
-	O comportamento do desequilíbrio operacional pode ser classificado em três níveis:
+	O comportamento da corrente diferencial é classificado em três níveis operacionais:
 	
-	\subsection*{Alerta}
+	\subsection*{Alarme}
 	
-	Caracteriza condição inicial de anormalidade. Recomenda-se análise operacional e inspeção preventiva.
+	Indica desequilíbrio inicial associado à perda limitada de unidades capacitivas. Recomenda-se inspeção programada e acompanhamento operacional.
 	
 	\subsection*{Preocupação}
 	
-	O desequilíbrio passa a impactar confiabilidade e desempenho, exigindo diagnóstico técnico detalhado.
+	Caracteriza aumento progressivo do desequilíbrio, podendo resultar em sobretensões nas unidades remanescentes.
 	
-	\subsection*{Nível Crítico}
+	\subsection*{Desligamento}
 	
-	Ultrapassado o limite admissível, o banco deve ser desligado automaticamente para evitar danos aos equipamentos e riscos operacionais.
-	
-	% ======================================================
-	\section{Monitoramento por TC ou TP de Neutro}
-	% ======================================================
-	
-	A Tabela~\ref{tab:df_subset} apresenta a avaliação das condições operacionais considerando perda progressiva de elementos capacitivos, conforme critérios do \href{https://ieeexplore.ieee.org/document/6466331}{IEEE Std 18} \cite{ieee18}.
+	Quando o limite crítico é atingido, o banco deve ser desligado automaticamente para evitar sobrecargas dielétricas e falhas em cascata.
 	
 	\begin{table}[htbp]
 		\small
 		\centering
-		\caption{Níveis de alarme e desligamento do banco.}
-		\input{./tables/tabela3ext_real.tex}
-		\label{tab:df_subset}
+		\caption{Níveis típicos de alarme e desligamento para corrente diferencial da ponte H.}
+		\input{./tables/tabela6_real.tex}
+		\label{tab:hbridge_levels}
 	\end{table}
 	
-	A filosofia de proteção estabelece que a sobretensão em qualquer célula capacitiva não deve exceder \(10\%\) da tensão nominal.
+	A filosofia de proteção estabelece que nenhuma célula capacitiva deve operar acima de \(110\%\) da tensão nominal.
 	
 	\begin{itemize}
-		\item valores em azul indicam níveis de alarme;
-		\item valores em vermelho indicam níveis de desligamento automático.
+		\item valores em azul correspondem aos níveis de alarme;
+		\item valores em vermelho correspondem aos níveis de desligamento automático.
 	\end{itemize}
 	
-	Sugere-se:
-	
-	\begin{itemize}
-		\item TC de neutro com corrente primária {{ctprimaryrated}} A e relação {{ctprimaryrated}}:{{secondarycurrenttc}};
-		\item alternativamente, TP com tensão primária {{ptprimaryrated}} V e relação {{ptprimaryrated}}:{{secondaryvoltagetp}}.
-	\end{itemize}
-	
-	Ambas as soluções permitem adequada supervisão e atuação das funções de proteção.
+	Recomenda-se transformador de corrente diferencial com corrente primária {{ctprimaryrated}} A e relação {{ctprimaryrated}}:{{secondarycurrenttc}}.
 	
 	% ======================================================
 	\section{Fator de Segurança}
 	% ======================================================
 	
-	Em aplicações de correção de fator de potência, é comum empregar capacitores com tensão nominal superior à tensão de operação do sistema.
+	Assim como em outras configurações de bancos de capacitores, é prática comum especificar capacitores com tensão nominal superior à tensão de operação do sistema.
 	
-	Principais justificativas:
+	Principais benefícios:
 	
 	\begin{enumerate}
-		\item aumento da margem dielétrica;
-		\item redução do estresse elétrico e térmico;
-		\item maior flexibilidade operacional e reaproveitamento futuro.
+		\item redução do estresse dielétrico;
+		\item aumento da vida útil das unidades capacitivas;
+		\item maior tolerância a transitórios e sobretensões temporárias.
 	\end{enumerate}
 	
-	A potência reativa fornecida é dada por
+	A potência reativa fornecida permanece definida por
 	
 	\[
 	Q = V^{2} C \omega

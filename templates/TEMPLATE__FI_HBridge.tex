@@ -1,43 +1,36 @@
 \documentclass[a4paper]{article}
-% Compilar com XeLaTeX ou LuaLaTeX
-%\usepackage{fontspec}
-%\setmainfont{Arial Narrow}   % corpo do texto
-%\setsansfont{Arial Narrow}   % caso use \textsf ou queira tudo em sans
-%\renewcommand{\familydefault}{\sfdefault} % (opcional) torna Arial Narrow a fonte padrão
-\usepackage{fontspec}
-\defaultfontfeatures{Ligatures=TeX}
-\setmainfont{Latin Modern Roman}
-\setsansfont{Latin Modern Sans}
-\setmonofont{Latin Modern Mono}
-\usepackage{amsmath}  % Pacote necessário para \dfrac
-\usepackage[utf8]{inputenc}
+
+% ======================================================
+% FONT
+% ======================================================
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+
+% ======================================================
+% LANGUAGE AND MATH
+% ======================================================
 \usepackage[portuguese]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+% ======================================================
+% GRAPHICS AND TABLES
+% ======================================================
 \usepackage{graphicx}
-\usepackage{array}
-\usepackage{fancyhdr}
-\usepackage{lastpage} % pacote para obter o número total de páginas
-\usepackage{geometry} % pacote para ajustar as margens
-\usepackage[datesep=/,style=ddmmyyyy]{datetime2} % pacote para formatar a data
-\usepackage{setspace} % Inclui o pacote setspace
-\usepackage{enumitem}
-\usepackage{amssymb} % Para mais símbolos
-\usepackage{indentfirst}
-\usepackage{hyperref}
 \usepackage{array}
 \usepackage{booktabs}
 \usepackage{xcolor}
-\usepackage{hyperref}
-\usepackage{xurl}
-\usepackage[style=ieee]{biblatex}
-\addbibresource{bibliografia.bib} % nome do seu arquivo .bib
-\usepackage{url}
 
-\usepackage{titlesec} % Inclui o pacote titlesec
-% Redefinindo o formato do título da seção com um tamanho de fonte menor
-\titleformat{\section}
-{\normalfont\large\bfseries}{\thesection}{1em}{}
+% ======================================================
+% PAGE LAYOUT
+% ======================================================
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{indentfirst}
+\usepackage{setspace}
+\usepackage{enumitem}
 
-% Definindo margens da página e do cabeçalho
 \geometry{
 	left=20mm,
 	right=20mm,
@@ -46,220 +39,237 @@
 	headsep=20mm
 }
 
-\pagestyle{fancy}
-\fancyhf{} % limpa o cabeçalho e rodapé padrão
-\renewcommand{\headrulewidth}{0pt} % remove a linha do cabeçalho
-\renewcommand{\footrulewidth}{0.4pt} % linha acima do rodapé
+% ======================================================
+% DATE FORMAT
+% ======================================================
+\usepackage[datesep=/,style=ddmmyyyy]{datetime2}
 
-\fancyhead[C]{ % conteúdo centralizado no cabeçalho
-	\begin{tabular}{|m{3.5cm}|m{9.0cm}|m{3.5cm}|}
+% ======================================================
+% LINKS
+% ======================================================
+\usepackage{hyperref}
+\usepackage{xurl}
+\usepackage{url}
+
+% ======================================================
+% BIBLIOGRAPHY
+% ======================================================
+\usepackage[style=ieee]{biblatex}
+\addbibresource{bibliografia.bib}
+
+% ======================================================
+% SECTION STYLE
+% ======================================================
+\usepackage{titlesec}
+\titleformat{\section}
+{\normalfont\large\bfseries}{\thesection}{1em}{}
+
+% ======================================================
+% HEADER / FOOTER
+% ======================================================
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+\fancyhead[C]{
+	\begin{tabular}{|m{3.5cm}|m{9cm}|m{3.5cm}|}
 		\hline
-		\begin{minipage}[c][2.0cm][c]{3.5cm}
+		\begin{minipage}[c][2cm][c]{3.5cm}
 			\centering
 			\includegraphics[width=2.98cm,height=1.25cm]{./figs/logo.png}
-		\end{minipage} & 
-		\begin{minipage}[c][2.0cm][c]{9cm}
+		\end{minipage}
+		&
+		\begin{minipage}[c][2cm][c]{9cm}
 			\centering
-			\hyphenpenalty=10000 % Evita hifenização
-			\vspace*{\fill} % Espaço vertical flexível antes do texto
-			\begin{spacing}{1.5} % Aumenta o espaçamento entre linhas para 1.25
-				{\large \textbf{Proteção de Banco de Capacitores}}
+			\hyphenpenalty=10000
+			\vspace*{\fill}
+			\begin{spacing}{1.5}
+				{\large \textbf{Proteção de Banco de\\ Capacitores em Ponte H}}
 			\end{spacing}
-			\vspace*{\fill} % Espaço vertical flexível depois do texto
-		\end{minipage} & 
-		\begin{minipage}[c][2.0cm][c]{3.5cm}
+			\vspace*{\fill}
+		\end{minipage}
+		&
+		\begin{minipage}[c][2cm][c]{3.5cm}
 			\raggedleft
-			Emissão: \DTMtoday \\
+			Emissão: \DTMtoday\\
 			Folha: \thepage/\pageref{LastPage}
-		\end{minipage} \\
+		\end{minipage}
+		\\
 		\hline
 	\end{tabular}
 }
 
+\fancyfoot[L]{\href{http://www.dax.energy}{www.dax.energy}}
+\fancyfoot[C]{\href{mailto:comercial@dax.energy}{comercial@dax.energy}}
+\fancyfoot[R]{+55 41 99281-3744}
 
-% Conteúdo do rodapé
-\fancyfoot[L]{%
-	\begin{tabular}[b]{@{}l@{}}
-		\href{http://www.dax.energy}{www.dax.energy}
-	\end{tabular}
-}
-\fancyfoot[C]{%
-	\begin{tabular}[b]{@{}c@{}}
-		\href{mailto:comercial@dax.energy}{comercial@dax.energy}
-	\end{tabular}
-}
-\fancyfoot[R]{%
-	\begin{tabular}[b]{@{}r@{}}
-		+55 41 99281-3744 
-	\end{tabular}
-}
-
-
+% ======================================================
 \begin{document}
-\setstretch{1.25} % Define o espaçamento entre linhas para 1.25
-
-\section{Contexto}
-Em sistemas elétricos, especialmente em bancos de capacitores de média tensão, pequenos desequilíbrios são naturais e geralmente esperados durante a operação. Esses desequilíbrios podem ser causados por diversas razões, como diferenças mínimas nas características dos capacitores individuais, variações nas tensões de alimentação, ou condições de carga ligeiramente desiguais. Em níveis baixos, esses desequilíbrios não comprometem a segurança ou a eficiência do sistema e são considerados dentro dos parâmetros normais de operação.
-
-Os bancos de capacitores são projetados para tolerar certos níveis de desequilíbrio sem prejuízos significativos. No entanto, é crucial monitorar continuamente esses desequilíbrios para garantir que permaneçam dentro de limites aceitáveis. Instrumentação adequada e sistemas de monitoramento ajudam a identificar e registrar os níveis de desequilíbrio, permitindo uma gestão proativa da operação do banco de capacitores.
-
-\begin{figure}[htbp]
-	\centering
-	\includegraphics[width=0.9\linewidth]{./figs/Figure36-h_bridge_internal_fuses}
-	\caption{Ilustração de um banco em dupla estrela assimétrica \cite{ieeec3799}.}
-	\label{fig:Figure36-h_bridge_internal_fuses}
-\end{figure}
-
-\noindent onde:
-
-\begin{itemize}
-	\item \textbf{S} é o número \textbf{total} de \textbf{grupos em série}.
-	\item \textbf{St} é o número de \textbf{grupos em série} da perna ``H'' (High) até o neutro (ponto de referência).
-	\item \textbf{Pt} = é o número \textbf{total} de \textbf{unidades em paralelo por fase}.
-	\item \textbf{Pa} é o número de \textbf{unidades em paralelo} no lado ``esquerdo'' da perna ``H''.
-	\item \textbf{P} é o número de \textbf{unidades em paralelo} na \textbf{string afetada} (provavelmente devido a uma falha ou análise).
-	\item \textbf{G} é o estado de aterramento/ligação à terra ($\mathbf{0}$ = \textbf{aterrado}, $\mathbf{1}$ = \textbf{não aterrado/desligado da terra}).
-	\item \textbf{N} é o número de \textbf{elementos em paralelo em um grupo} (série).
-	\item \textbf{Su} é o número de \textbf{grupos em série} em uma \textbf{unidade capacitiva}.
-\end{itemize}
-
-
-
-Em uma configuração estrela, o neutro do banco de capacitores não é conectado diretamente à terra. Em condições normais de operação, a tensão $V_{OG}$ (entre neutro e terra) e/ou a corrente $I_n$ (entre estrelas) é muito baixa (idealmente zero). No entanto, no caso de queima parcial de unidades capacitivas, essas grandezas aumentam, indicando a necessidade de uma intervenção, a depender de seu valor.
-
-Para monitorar essas grandezas deslocamento, um Transformador de Potencial (para estrela simples isolada) ou um Transformador de Corrente (dupla estrela isolada) é utilizado para medir a tensão de deslocamento de neutro ou a corrente de desequilíbrio entre as estrelas.  
-
-Por fim, o relé do disjuntor associado ao banco de capacitores comunica-se com o sistema supervisório, permitindo a detecção e o monitoramento em tempo real das condições operacionais e facilitando a tomada de decisão remota em caso de anomalias na tensão de deslocamento do neutro ou corrente de desequilíbrio entre as estrelas.
-
-
-
-\section{Banco em Tela}
-
-Trata-se de um banco de capacitores configurado em dupla estrela isolada, no qual os capacitores são do tipo com fusíveis internos. Esse arranjo é frequentemente utilizado em sistemas de média tensão com o objetivo de compensar reativos, melhorar o fator de potência e reduzir perdas no sistema elétrico. A configuração em dupla estrela oferece maior robustez e continuidade de serviço, uma vez que permite melhor distribuição das tensões entre os capacitores e maior tolerância a falhas individuais. A utilização de fusíveis internos em cada capacitor permite a desconexão automática da unidade em caso de falha interna, evitando a propagação de danos e facilitando a manutenção do banco como um todo.
-
-\begin{table}[htbp]
-	\centering
-	\renewcommand{\arraystretch}{1.25}
-	\caption[]{Dados de Entrada do Banco de Capacitores.}
-	\input{./tables/tabela_dados_nominais.tex}
-	\label{tab:tabela8_real}
-\end{table}
-
-
-
-
-
-
-\section{Níveis de Alerta e de Ação}
-Quando os desequilíbrios excedem um nível determinado, mas ainda estão abaixo de um ponto crítico, é necessário atenção redobrada. Esse nível inicial de alerta indica que algo pode estar se desenvolvendo no sistema que requer investigação. Nessa fase, medidas de diagnóstico adicionais devem ser adotadas para identificar a causa do desequilíbrio. Manutenções preventivas, inspeções e ajustes podem ser necessários para corrigir ou mitigar as causas subjacentes.
-
-\section{Nível de Preocupação}
-Se o desequilíbrio continuar a aumentar e atinge um nível maior, ele deve ser tratado com preocupação. Nesta fase, o desequilíbrio pode começar a afetar negativamente a eficiência e a segurança do sistema. Os técnicos responsáveis devem realizar uma análise detalhada para determinar se há componentes defeituosos, deterioração dos capacitores, problemas de conexão ou outras falhas que possam estar contribuindo para o desequilíbrio.
-
-\section{Nível crítico - desligamento do banco}
-Acima de um certo nível crítico de desequilíbrio, a operação contínua do banco de capacitores pode se tornar perigosa e ineficiente. Esse nível crítico é um ponto de ação definitiva, onde o banco de capacitores deve ser desligado imediatamente para evitar danos aos equipamentos, riscos de segurança e interrupções no fornecimento de energia. O desligamento permite uma inspeção completa e a implementação das correções necessárias antes de o banco de capacitores ser colocado de volta em operação.
-
-\section{TC ou TP de neutro}
-A Tabela \ref{tab:df_subset} é uma análise detalhada das condições operacionais de um banco de capacitores, levando em consideração a perda de elementos capacitivos. Esta análise segue as diretrizes estabelecidas pelo \href{https://ieeexplore.ieee.org/document/6466331}{IEEE Std 18 - \textit{IEEE Standard for Shunt Power Capacitors} \cite{ieee18}}, que fornece critérios para proteção e operação de capacitores de potência em sistemas de energia elétrica.
-
-\begin{table}[htbp]
-	\small
-	\centering
-	\caption[]{Tabela de desbalanço (Tensões de alarme e desligamento automático do banco de capacitores)}
-	\input{./tables/tabela8_real.tex}
-	\label{tab:df_subset}
-\end{table}
-
-
-
-
-Neste caso específico, cada célula capacitiva do banco é composta por {{N}} elementos em paralelo e {{Su}} elementos em série. Essa configuração garante uma distribuição adequada da tensão e corrente entre os elementos, aumentando a confiabilidade e a capacidade do banco de suportar variações operacionais.
-
-Esta tabela, baseada nas diretrizes do IEEE Std 18, é uma ferramenta valiosa para a operação segura de bancos de capacitores. Ela permite que engenheiros identifiquem rapidamente quando o sistema está se aproximando de condições perigosas, acionando alarmes e trips conforme necessário para proteger os capacitores e o sistema elétrico como um todo. A configuração específica de $N$ elementos em paralelo e $Su$ em série deve ser cuidadosamente monitorada para garantir que a tensão, corrente e capacitância permaneçam dentro dos limites operacionais seguros, prevenindo falhas catastróficas e garantindo a continuidade do serviço.
-
-%Há duas filosofias de proteção que podem ser adotadas aqui, ambas considerando o desligamento considerando a sobretensão de 10\% em cada unidade, uma tendo como base a tensão de trabalho (números na cor \textcolor{yellow!50!black}{bronze} da Tab. \ref{tab:df_subset}), e outra é tendo como base a tensão nominal da célula (números da cor \textcolor{red}{vermelha} da Tab. \ref{tab:df_subset}). Os números na cor \textcolor{blue}{azul} da Tab. \ref{tab:df_subset} são os sugeridos para alarme.
-
-A filosofia de proteção adotada é no sentido de que a tensão em nenhuma célula supere os 10\% da tensão nominal da unidade. Os números na cor \textcolor{blue}{azul} da Tab. \ref{tab:df_subset} são os sugeridos para alarme e os números na cor \textcolor{red}{vermelha} da Tab. \ref{tab:df_subset} para o desligamento.
-
-Para atendimento às necessidades do sistema, sugere-se um TC com {\it corrente primária de} {{ctprimaryrated}} A, com relação de transformação {{ctprimaryrated}}:{{secondarycurrenttc}}. Trata-se de um TC de neutro, destinado à proteção de um banco de capacitores, capaz de monitorar desequilíbrios de corrente no neutro e acionar os dispositivos de proteção de forma adequada, garantindo a segurança e a confiabilidade da instalação.
-
-Como alternativa ao uso do TC, pode-se instalar um TP com {\it tensão primária de} {{ptprimaryrated}} V, com relação de transformação {{ptprimaryrated}}:{{secondaryvoltagetp}}, classe de exatidão adequada à proteção, isolamento compatível e capacidade de atender à carga dos relés sem exceder o erro permitido; essa configuração permite monitorar continuamente a tensão de neutro e acionar alarmes ou o desligamento sempre que sobre-tensões nas células ultrapassarem os limites definidos.
-
-\section{Fator de Segurança}
-
-Em alguns casos usa-se capacitores para correção do fator de potencia com tensão nominal acima da tensão de trabalho, mantendo-se a capacitância, devido a três razões principais:
-\begin{enumerate}
-	\item Margem de segurança elétrica: capacitores operando próximos ao seu limite de tensão nominal estão mais sujeitos a:
+	\setstretch{1.25}
+	
+	% ======================================================
+	\section{Contexto}
+	% ======================================================
+	
+	Bancos de capacitores conectados em ponte H são amplamente utilizados em sistemas de média e alta tensão quando se deseja elevada sensibilidade na detecção de falhas internas e maior estabilidade frente a desequilíbrios naturais do sistema elétrico.
+	
+	Pequenos desvios de capacitância entre unidades são inevitáveis devido às tolerâncias construtivas, envelhecimento dielétrico e variações operacionais. Em regime normal, tais desequilíbrios produzem correntes diferenciais muito reduzidas na ponte, não comprometendo o desempenho do banco.
+	
+	Entretanto, a perda parcial de elementos capacitivos ou falhas internas provoca alteração significativa do equilíbrio elétrico da ponte H, resultando no surgimento de corrente diferencial mensurável. Essa característica torna a configuração em ponte H particularmente adequada para esquemas de proteção sensíveis.
+	
+	\begin{figure}[htbp]
+		\centering
+		\includegraphics[width=0.9\linewidth]{./figs/Figure36-h_bridge_internal_fuses}
+		\caption{Configuração típica de banco de capacitores em ponte H com fusíveis internos.}
+	\end{figure}
+	
+	A filosofia de operação baseia-se no princípio de equilíbrio elétrico entre os ramos da ponte. Em condição ideal, a diferença de potencial entre os pontos médios é próxima de zero, resultando em corrente diferencial nula.
+	
+	% ======================================================
+	\section{Banco em Estudo}
+	% ======================================================
+	
+	\begin{figure}[htbp]
+		\centering
+		\includegraphics[height=8cm, width=16cm]{./figs/bank_diagram_matplotlib}
+		\caption{Diagrama elétrico do banco de capacitores em ponte H analisado.}
+		\label{fig:h_bridge_bank}
+	\end{figure}
+	
+	O banco analisado é constituído por unidades capacitivas com fusíveis internos conectadas em configuração ponte H, conforme ilustrado na Fig.~\ref{fig:h_bridge_bank}.
+	
+	Essa topologia apresenta as seguintes características:
+	
 	\begin{itemize}
-		\item envelhecimento precoce do dielétrico,
-		\item falhas por surtos,
-		\item degradação térmica.
+		\item elevada sensibilidade para detecção de falhas internas;
+		\item operação estável mesmo com pequenas assimetrias naturais;
+		\item continuidade operacional após falha individual de elementos;
+		\item eliminação da necessidade de neutro aterrado.
 	\end{itemize}
-	\item Durabilidade e confiabilidade: capacitores operando abaixo de sua tensão nominal sofre menor estresse dielétrico, o que reduz:
+	
+	Os fusíveis internos promovem a desconexão automática do elemento defeituoso, evitando propagação da falha e preservando a integridade do banco.
+	
+	\begin{table}[htbp]
+		\centering
+		\renewcommand{\arraystretch}{1.25}
+		\caption{Dados nominais do banco de capacitores.}
+		\input{./tables/tabela_dados_nominais.tex}
+	\end{table}
+	
+	% ======================================================
+	\section{Princípio de Detecção de Desequilíbrio}
+	% ======================================================
+	
+	Na configuração em ponte H, a proteção baseia-se na medição da corrente diferencial entre os pontos médios da ponte.
+	
+	Em operação equilibrada:
+	\(
+	I_{\text{diff}} \approx 0.
+	\)
+	A perda de elementos capacitivos altera a impedância de um dos ramos, produzindo corrente diferencial proporcional ao nível de desequilíbrio.
+	
+	A medição pode ser realizada por meio de:
+	
 	\begin{itemize}
-		\item geração de calor,
-		\item risco de ruptura interna,
-		\item frequência de manutenção.
+		\item Transformador de Corrente diferencial instalado no elo da ponte;
+		\item Sistema de proteção dedicado à função de desequilíbrio de capacitor.
 	\end{itemize}
-	\item Flexibilidade na aplicação: capacitores com tensão nominal superior podem ser reutilizados em outras redes com tensão mais alta, aumentando a versatilidade do equipamento.
-\end{enumerate}
-
-É importante notar que a potência reativa fornecida por um capacitor é dada por $Q = V^2 \cdot C \cdot \omega,$ ou seja, depende da tensão efetiva aplicada, não da tensão nominal do capacitor. Assim, se a tensão da rede (tensão de trabalho) for mantida constante, a potência reativa fornecida continuará a mesma, mesmo que o capacitor tenha uma tensão nominal mais alta — desde que a capacitância seja mantida.
-  
-
-
-
-\printbibliography
-
-
-
-
-
-
-
-% Espaço para assinaturas
-\noindent % Evita a indentação
-\begin{minipage}[t]{0.3\textwidth}
-	\centering
-	\vspace{4cm}
-	\rule{5cm}{0.4pt}\\
-	{\linespread{0.9}\selectfont % Reduz o espaçamento entre linhas
+	
+	Essa técnica permite detectar falhas incipientes antes que ocorram sobretensões perigosas nas unidades restantes.
+	
+	% ======================================================
+	\section{Níveis de Supervisão}
+	% ======================================================
+	
+	O comportamento da corrente diferencial é normalmente dividido em três níveis operacionais:
+	
+	\subsection*{Alarme}
+	
+	Indica surgimento de desequilíbrio inicial. Recomenda-se inspeção programada e acompanhamento da tendência operacional.
+	
+	\subsection*{Preocupação}
+	
+	Caracteriza degradação progressiva das unidades capacitivas, exigindo análise técnica detalhada.
+	
+	\subsection*{Desligamento}
+	
+	Quando a corrente diferencial ultrapassa o limite admissível, o banco deve ser desligado automaticamente para evitar sobrecarga dielétrica e falhas em cascata.
+	
+	\begin{table}[htbp]
+		\small
+		\centering
+		\caption{Níveis típicos de alarme e desligamento para corrente diferencial da ponte H.}
+		\input{./tables/tabela8_real.tex}
+		\label{tab:hbridge_levels}
+	\end{table}
+	
+	A filosofia de proteção estabelece que nenhuma célula capacitiva deve operar acima de \(110\%\) da tensão nominal.
+	
+	\begin{itemize}
+		\item valores em azul representam níveis de alarme;
+		\item valores em vermelho representam níveis de desligamento automático.
+	\end{itemize}
+	
+	Sugere-se transformador de corrente diferencial com corrente primária {{ctprimaryrated}} A e relação {{ctprimaryrated}}:{{secondarycurrenttc}}.
+	
+	% ======================================================
+	\section{Fator de Segurança}
+	% ======================================================
+	
+	Assim como em outras topologias de bancos de capacitores, é prática comum especificar capacitores com tensão nominal superior à tensão de operação do sistema.
+	
+	Principais benefícios:
+	
+	\begin{enumerate}
+		\item redução do estresse dielétrico;
+		\item aumento da vida útil dos capacitores;
+		\item maior robustez frente a transitórios e sobretensões temporárias.
+	\end{enumerate}
+	
+	A potência reativa fornecida permanece definida por	
+	\(
+	Q = V^{2} C \omega
+	\)
+	dependendo da tensão efetivamente aplicada e da capacitância instalada.
+	
+	% ======================================================
+	\printbibliography
+	% ======================================================
+	
+	\vspace{2cm}
+	
+	\noindent
+	\begin{minipage}[t]{0.3\textwidth}
+		\centering
+		\vspace{4cm}
+		\rule{5cm}{0.4pt}\\
 		\textbf{Angelo A. Hafner}\\
-		\small
-		Engenheiro Eletricista\\ Doutor em Eletromagnetismo\\
+		\small Engenheiro Eletricista\\
+		Doutor em Eletromagnetismo\\
 		CONFEA: 2.500.821.919\\
-		CREA/SC: 045.776-5\\
-	}
-\end{minipage}
-\hfill % Espaço entre as colunas
-\begin{minipage}[t]{0.3\textwidth}
-	\centering
-	\vspace{4cm}
-	\rule{5cm}{0.4pt}\\
-	{\linespread{0.9}\selectfont % Reduz o espaçamento entre linhas
+		CREA/SC: 045.776-5
+	\end{minipage}
+	\hfill
+	\begin{minipage}[t]{0.3\textwidth}
+		\centering
+		\vspace{4cm}
+		\rule{5cm}{0.4pt}\\
 		\textbf{Daniel H. Pires}\\
-		\small
-		Engenheiro Eletricista\\ Especialista em Sistemas de Potência\\
+		\small Engenheiro Eletricista\\
+		Especialista em Sistemas de Potência\\
 		CONFEA: 7.718.547.498\\
-		CREA/PR: 179.137/D\\
-	}
-\end{minipage}
-\hfill % Espaço entre as colunas
-\begin{minipage}[t]{0.3\textwidth}
-	\centering
-	\vspace{4cm}
-	\rule{5cm}{0.4pt}\\
-	{\linespread{0.9}\selectfont % Reduz o espaçamento entre linhas
+		CREA/PR: 179.137/D
+	\end{minipage}
+	\hfill
+	\begin{minipage}[t]{0.3\textwidth}
+		\centering
+		\vspace{4cm}
+		\rule{5cm}{0.4pt}\\
 		\textbf{Fabricio R. Frangiotti}\\
-		\small
-		Engenheiro Eletricista\\ Especialista em Capacitor de Potência\\
-		CREA/SP: 5061.769.065/D\\
-	}
-\end{minipage}
-
-
-
-
-
-
+		\small Engenheiro Eletricista\\
+		Especialista em Capacitores de Potência\\
+		CREA/SP: 5061.769.065/D
+	\end{minipage}
+	
 \end{document}

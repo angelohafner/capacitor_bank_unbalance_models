@@ -30,34 +30,24 @@ def show_topology_figure(dados_nominais_banco):
     if topologia == "y_internal_fuses":
         S = int(dados_nominais_banco.get("S", 4))
         diagram = ThreePhaseYInternalFusesDiagram(S=S)
-        # Half-size (only for this topology)
         fig_plotly = diagram.make_figure(width=450, height=350)
-
         st.plotly_chart(fig_plotly, width='stretch')
         fig_plotly.write_image(FIG_DIR/"bank_diagram_matplotlib.pdf")
-
-
         return
-
     # ---------------- Plotly: double-wye (yy) diagrams ----------------
     if topologia == "yy_internal_fuses":
         P = int(dados_nominais_banco.get("P", 3))
         S = int(dados_nominais_banco.get("S", 4))
         Pt = int(dados_nominais_banco.get("Pt", 11))
         Pa = int(dados_nominais_banco.get("Pa", 6))
-
         result = validate_inputs(topology=topologia, data=dados_nominais_banco)
         if result.is_valid is False:
             st.warning("\n".join(result.errors))
             return
-
         diagram = BankDiagram(P=P, S=S, Pt=Pt, Pa_left=Pa)
         fig_plotly = diagram.make_figure()
         st.plotly_chart(fig_plotly, width='stretch')
-
-        fig_mpl, ax = plotly_figure_to_matplotlib(fig_plotly, figsize=(30, 10))
-        fig_mpl.savefig(FIG_DIR/"bank_diagram_matplotlib.pdf", format="pdf", bbox_inches="tight")  # ou .png dpi=300
-
+        fig_plotly.write_image(FIG_DIR / "bank_diagram_matplotlib.pdf")
         return
 
     if topologia == "yy_external_fuses":
@@ -67,21 +57,15 @@ def show_topology_figure(dados_nominais_banco):
         S = int(dados_nominais_banco.get("S", 4))
         Pt = int(dados_nominais_banco.get("Pt", 14))
         Pa = int(dados_nominais_banco.get("Pa", 8))
-
         result = validate_inputs(topology=topologia, data=dados_nominais_banco)
         if result.is_valid is False:
             st.warning("\n".join(result.errors))
             return
-
         diagram = BankDiagram(P=P, S=S, Pt=Pt, Pa_left=Pa)
         fig_plotly = diagram.make_figure()
         st.plotly_chart(fig_plotly, width='stretch')
-
-        fig_mpl, ax = plotly_figure_to_matplotlib(fig_plotly, figsize=(30, 10))
-        fig_mpl.savefig(FIG_DIR / "bank_diagram_matplotlib.pdf", format="pdf", bbox_inches="tight")
-
-    return
-
+        fig_plotly.write_image(FIG_DIR / "bank_diagram_matplotlib.pdf")
+        return
     # ---------------- Plotly: H-bridge diagrams ----------------
     if topologia == "h_bridge_internal_fuses" or topologia == "h_bridge_external_fuses":
         S = int(dados_nominais_banco.get("S", 7))
@@ -89,13 +73,10 @@ def show_topology_figure(dados_nominais_banco):
         Pt = int(dados_nominais_banco.get("Pt", 9))
         Pa = int(dados_nominais_banco.get("Pa", 5))
         P = int(dados_nominais_banco.get("P", 2))
-
-        # Validate inputs (show message instead of crashing)
         result = validate_inputs(topology=topologia, data=dados_nominais_banco)
         if result.is_valid is False:
             st.warning("\n".join(result.errors))
             return
-
         h = HCompleteWithNeutralCT(
             Pt=Pt,
             Pa=Pa,
@@ -109,15 +90,14 @@ def show_topology_figure(dados_nominais_banco):
             ct_box_w=3.2,
             ct_box_h=1.4,
         )
-
         fig_plotly = h.make_figure(title="H-Bridge", width=1600, height=450)
         st.plotly_chart(fig_plotly, width='stretch')
+        fig_plotly.write_image(FIG_DIR / "bank_diagram_matplotlib.pdf")
+        return
 
-        fig_mpl, ax = plotly_figure_to_matplotlib(fig_plotly, figsize=(30, 10))
-        fig_mpl.savefig(FIG_DIR / "bank_diagram_matplotlib.pdf", format="pdf", bbox_inches="tight")
-
-    return
     st.warning(f"No figure defined for topology '{topologia}'")
+
+
 def _serialize_to_json_bytes(obj) -> bytes:
     """Serialize a dict/DataFrame/Series/list to JSON bytes (UTF-8)."""
     if isinstance(obj, pd.DataFrame):
